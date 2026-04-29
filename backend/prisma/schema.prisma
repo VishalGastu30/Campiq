@@ -1,0 +1,93 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id        String   @id @default(cuid())
+  name      String
+  email     String   @unique
+  password  String
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  savedColleges SavedCollege[]
+
+  @@map("users")
+}
+
+model College {
+  id               String      @id @default(cuid())
+  name             String
+  slug             String      @unique
+  logoUrl          String?
+  bannerUrl        String?
+  location         String
+  city             String
+  state            String
+  type             CollegeType
+  establishedYear  Int
+  rating           Float       @default(0.0)
+  totalRatings     Int         @default(0)
+  minFees          Int
+  maxFees          Int
+  nirfRank         Int?
+  naacGrade        String?
+  placementPercent Float?
+  avgPackage       Float?
+  highestPackage   Float?
+  topRecruiters    String[]
+  about            String      @db.Text
+  website          String?
+  phone            String?
+  email            String?
+  address          String?
+  ugcApproved      Boolean     @default(false)
+  aiuMember        Boolean     @default(false)
+  createdAt        DateTime    @default(now())
+  updatedAt        DateTime    @updatedAt
+
+  courses   Course[]
+  savedBy   SavedCollege[]
+
+  @@map("colleges")
+}
+
+enum CollegeType {
+  PRIVATE
+  GOVERNMENT
+  DEEMED
+  AUTONOMOUS
+}
+model Course {
+  id          String  @id @default(cuid())
+  collegeId   String
+  name        String
+  degree      String
+  duration    Int
+  fees        Int
+  seats       Int?
+  category    String
+  eligibility String?
+
+  college College @relation(fields: [collegeId], references: [id], onDelete: Cascade)
+
+  @@map("courses")
+}
+
+model SavedCollege {
+  id        String   @id @default(cuid())
+  userId    String
+  collegeId String
+  savedAt   DateTime @default(now())
+
+  user    User    @relation(fields: [userId], references: [id], onDelete: Cascade)
+  college College @relation(fields: [collegeId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, collegeId])
+  @@map("saved_colleges")
+}

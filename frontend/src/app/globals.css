@@ -1,0 +1,99 @@
+@import "tailwindcss";
+
+:root {
+  --bg-base: #0C1117;
+  --bg-surface: #131B24;
+  --bg-raised: #1A2535;
+  --accent-teal: #00D4A0;
+  --accent-amber: #F5A623;
+  --accent-violet: #9B7BFF;
+  --text-primary: #E8F0FC;
+  --text-secondary: #7A93B0;
+  --text-muted: #3E5470;
+  --border-light: rgba(0, 212, 160, 0.12);
+  --border-strong: rgba(0, 212, 160, 0.25);
+  --gradient-sig: linear-gradient(135deg, #00D4A0, #9B7BFF);
+}
+
+@theme inline {
+  --color-campiq-base: var(--bg-base);
+  --color-campiq-surface: var(--bg-surface);
+  --color-campiq-raised: var(--bg-raised);
+  --color-campiq-teal: var(--accent-teal);
+  --color-campiq-amber: var(--accent-amber);
+  --color-campiq-violet: var(--accent-violet);
+  --color-campiq-text-primary: var(--text-primary);
+  --color-campiq-text-secondary: var(--text-secondary);
+  --color-campiq-text-muted: var(--text-muted);
+  --color-campiq-border: var(--border-light);
+  --color-campiq-border-strong: var(--border-strong);
+  
+  --font-sans: var(--font-geist-sans);
+  --font-mono: var(--font-geist-mono);
+}
+
+body {
+  background-color: var(--bg-base);
+  color: var(--text-primary);
+  font-family: var(--font-sans), sans-serif;
+  overflow-x: hidden;
+}
+
+/* Custom Scrollbar for Dark Theme */
+::-webkit-scrollbar {
+  width: 8px;
+}
+::-webkit-scrollbar-track {
+  background: var(--bg-base);
+}
+::-webkit-scrollbar-thumb {
+  background: var(--bg-raised);
+  border-radius: 4px;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: var(--text-muted);
+}
+
+/* Floating Orb Animation */
+@keyframes orb-drift {
+  0%, 100% { transform: translate(0, 0) scale(1); }
+  33% { transform: translate(30px, -20px) scale(1.05); }
+  66% { transform: translate(-20px, 25px) scale(0.97); }
+}
+
+.animate-orb-drift {
+  animation: orb-drift 15s infinite ease-in-out;
+}
+
+/* Shimmer Sweep Animation */
+@keyframes shimmer {
+  0% { transform: translateX(-100%); }
+  100% { transform: translateX(100%); }
+}
+
+.hover-shimmer {
+  position: relative;
+  overflow: hidden;
+}
+
+.hover-shimmer::after {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(90deg, transparent, rgba(255,255,255,0.2), transparent);
+  transform: translateX(-100%);
+  transition: transform 0.5s;
+}
+
+.hover-shimmer:hover::after {
+  animation: shimmer 1.5s infinite;
+}
+
+/* Override skeleton loader colors */
+.react-loading-skeleton {
+  --base-color: var(--bg-raised) !important;
+  --highlight-color: var(--bg-surface) !important;
+}
