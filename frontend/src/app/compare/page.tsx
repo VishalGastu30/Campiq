@@ -13,31 +13,38 @@ import Link from 'next/link';
 import { useRouter, useSearchParams } from 'next/navigation';
 
 function CompareContent() {
-  const { compareIds, removeFromCompare, addToCompare } = useCompare();
+  const { compareIds, removeFromCompare, addToCompare, setCompareIdsBulk } = useCompare();
   const [colleges, setColleges] = useState<College[]>([]);
   const [isLoading, setIsLoading] = useState(true);
+  const [isInitialized, setIsInitialized] = useState(false);
 
   const router = useRouter();
   const searchParams = useSearchParams();
   const [copied, setCopied] = useState(false);
 
-  // Sync from URL to context on mount if context is empty
+  // Sync from URL to context on mount
   useEffect(() => {
     const urlColleges = searchParams.get('colleges');
-    if (urlColleges && compareIds.length === 0) {
-      const ids = urlColleges.split(',');
-      ids.forEach(id => addToCompare(id));
+    if (urlColleges) {
+      const ids = urlColleges.split(',').filter(Boolean);
+      if (ids.length > 0) {
+        setCompareIdsBulk(ids);
+      }
     }
-  }, [searchParams]);
+    // Small delay to allow context state to update before we start syncing back to URL
+    setTimeout(() => setIsInitialized(true), 100);
+  }, []);
 
   // Sync from context to URL
   useEffect(() => {
+    if (!isInitialized) return; // Don't wipe URL before we've read it!
+    
     if (compareIds.length > 0) {
       router.replace(`/compare?colleges=${compareIds.join(',')}`, { scroll: false });
     } else {
       router.replace(`/compare`, { scroll: false });
     }
-  }, [compareIds, router]);
+  }, [compareIds, router, isInitialized]);
 
   useEffect(() => {
     const fetchColleges = async () => {

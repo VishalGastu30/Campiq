@@ -1,46 +1,67 @@
+// src/app.ts
 import express from 'express';
 import cors from 'cors';
-import dotenv from 'dotenv';
-import { authRoutes } from './routes/auth.routes';
-import { collegeRoutes } from './routes/college.routes';
-import { savedRoutes } from './routes/saved.routes';
-import { aiRoutes } from './routes/ai.routes';
-import { errorMiddleware } from './middleware/error.middleware';
 import helmet from 'helmet';
-import rateLimit from 'express-rate-limit';
-
-dotenv.config();
+import { collegeRoutes } from './routes/colleges';
+import { authRoutes } from './routes/auth';
+import { savedRoutes } from './routes/saved';
+import { compareRoutes } from './routes/compare';
+import { aiRoutes } from './routes/ai';
+import { ZodError } from 'zod';
 
 const app = express();
 
+// Security headers — one line, big impact
 app.use(helmet());
 
-const limiter = rateLimit({
-  windowMs: 15 * 60 * 1000, // 15 minutes
-  max: 100, // limit each IP to 100 requests per windowMs
-  message: { success: false, error: { message: 'Too many requests from this IP, please try again later.' } }
-});
-
-const authLimiter = rateLimit({
-  windowMs: 15 * 60 * 1000,
-  max: 10, // tighter limit for auth
-  message: { success: false, error: { message: 'Too many auth attempts, please try again later.' } }
-});
-
+// CORS — only allow your Vercel domain in production
 app.use(cors({
-  origin: process.env.FRONTEND_URL || 'http://localhost:3000',
-  credentials: true
+  origin: process.env.NODE_ENV === 'production'
+    ? process.env.FRONTEND_URL  // e.g. https://campiq.vercel.app
+    : 'http://localhost:3000',
+  credentials: true,
 }));
+
 app.use(express.json());
-app.use(limiter);
 
-app.get('/api/health', (_, res) => res.json({ status: 'ok', timestamp: new Date().toISOString() }));
+// Health check — Render uses this to verify the service is up
+app.get('/health', (_, res) => res.json({ status: 'ok', timestamp: new Date() }));
+app.get('/api/health', (_, res) => res.json({ status: 'ok', timestamp: new Date() })); // keep old one for compat
 
-app.use('/api/auth', authLimiter, authRoutes);
+// Routes
 app.use('/api/colleges', collegeRoutes);
+app.use('/api/auth', authRoutes);
 app.use('/api/saved', savedRoutes);
+app.use('/api/compare', compareRoutes);
 app.use('/api/ai', aiRoutes);
 
-app.use(errorMiddleware);
+// Global error handler — MUST be the last middleware
+app.use((err: any, req: express.Request, res: express.Response, next: express.NextFunction) => {
+  console.error('[ERROR]', err);
+  
+  if (err instanceof ZodError) {
+    return res.status(400).json({
+      success: false,
+      error: {
+        code: 'VALIDATION_ERROR',
+        message: 'Invalid request data',
+        details: err.errors
+      }
+    });
+  }
+
+  // Don't leak internal error details in production
+  const message = process.env.NODE_ENV === 'production'
+    ? 'Something went wrong'
+    : err.message;
+
+  res.status(err.status || 500).json({
+    success: false,
+    error: {
+      code: err.code || 'INTERNAL_ERROR',
+      message,
+    }
+  });
+});
 
 export default app;

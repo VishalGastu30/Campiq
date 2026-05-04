@@ -163,7 +163,7 @@ export function HeroSection() {
           <Button size="lg" variant="secondary" onClick={() => router.push('/compare')}>
             Compare Now
           </Button>
-          <Button size="lg" className="bg-indigo-500 hover:bg-indigo-600 text-white border-indigo-500 shadow-[0_0_15px_rgba(99,102,241,0.4)]" onClick={() => setIsAiModalOpen(true)}>
+          <Button size="lg" className="bg-gradient-sig text-white border-0 shadow-[0_0_20px_rgba(155,123,255,0.4)] hover:shadow-[0_0_30px_rgba(155,123,255,0.6)] hover:-translate-y-0.5 transition-all duration-300" onClick={() => setIsAiModalOpen(true)}>
             <Sparkles className="mr-2" size={18} /> Ask AI
           </Button>
         </motion.div>

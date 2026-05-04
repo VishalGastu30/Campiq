@@ -69,7 +69,7 @@ export function CollegeSelector({ selectedCollege, onSelect, onRemove, index }: 
             {getInitials(selectedCollege.name)}
           </div>
           <h3 className="font-bold text-campiq-text-primary text-lg leading-tight line-clamp-2">{selectedCollege.name}</h3>
-          <p className="text-sm text-campiq-text-muted mt-2">{selectedCollege.location}</p>
+          <p className="text-sm text-campiq-text-muted mt-2">{selectedCollege.city}, {selectedCollege.state}</p>
         </div>
       </div>
     );
@@ -138,7 +138,7 @@ export function CollegeSelector({ selectedCollege, onSelect, onRemove, index }: 
                     </div>
                     <div className="flex-1 min-w-0">
                       <p className="text-sm font-medium text-campiq-text-primary truncate">{college.name}</p>
-                      <p className="text-xs text-campiq-text-muted truncate">{college.location}</p>
+                      <p className="text-xs text-campiq-text-muted truncate">{college.city}, {college.state}</p>
                     </div>
                     {isAlreadySelected && <Check size={16} className="text-campiq-teal shrink-0" />}
                   </button>

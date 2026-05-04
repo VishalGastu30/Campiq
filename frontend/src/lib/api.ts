@@ -5,12 +5,14 @@ export interface CollegeQueryParams {
   search?: string;
   state?: string;
   type?: string;
+  stream?: string;
+  course?: string;
   minFees?: number;
   maxFees?: number;
-  course?: string;
   page?: number;
   limit?: number;
-  sortBy?: 'rating' | 'nirfRank' | 'fees' | 'placement';
+  sort?: 'nirfRank' | 'fees' | 'placement' | 'name';
+  order?: 'asc' | 'desc';
 }
 
 const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:4000/api';
@@ -30,17 +32,50 @@ axiosInstance.interceptors.request.use((config) => {
   return config;
 });
 
+axiosInstance.interceptors.response.use(
+  (response) => response,
+  (error) => {
+    if (error.response?.status === 401) {
+      // Token expired or invalid — clear auth and redirect
+      if (typeof window !== 'undefined') {
+        localStorage.removeItem('campiq_token');
+        localStorage.removeItem('campiq_user');
+        window.dispatchEvent(new Event('auth:logout'));
+      }
+    }
+    
+    // Extract the user-friendly backend error message if it exists
+    const backendError = error.response?.data?.error;
+    if (backendError) {
+      if (backendError.code === 'VALIDATION_ERROR' && backendError.details?.length > 0) {
+        error.message = backendError.details[0].message;
+      } else if (backendError.message) {
+        error.message = backendError.message;
+      }
+    }
+    
+    return Promise.reject(error);
+  }
+);
+
 export const api = {
   colleges: {
     async getAll(params: CollegeQueryParams): Promise<PaginatedResponse<College>> {
       const { data } = await axiosInstance.get('/colleges', { params });
-      return data.data;
+      return {
+        data: data.data.colleges,
+        total: data.data.pagination.total,
+        page: data.data.pagination.page,
+        totalPages: data.data.pagination.totalPages,
+        hasNext: data.data.pagination.hasNext,
+        hasPrev: data.data.pagination.hasPrev
+      };
     },
 
-    async getById(id: string): Promise<College | null> {
+    async getById(idOrSlug: string): Promise<College | null> {
       try {
-        const { data } = await axiosInstance.get(`/colleges/${id}`);
-        return data;
+        const { data } = await axiosInstance.get(`/colleges/${idOrSlug}`);
+        return data.data;
       } catch (e: any) {
         if (e.response?.status === 404) return null;
         throw e;
@@ -49,46 +84,46 @@ export const api = {
 
     async getCompare(ids: string[]): Promise<College[]> {
       if (!ids.length) return [];
-      const { data } = await axiosInstance.get('/colleges/compare', {
+      const { data } = await axiosInstance.get('/compare', {
         params: { ids: ids.join(',') }
       });
-      return data;
+      return data.data;
     },
 
     async getFilterMeta(): Promise<FilterMeta> {
-      const { data } = await axiosInstance.get('/colleges/filters/meta');
-      return data;
+      const { data } = await axiosInstance.get('/colleges/meta/filters');
+      return data.data;
     }
   },
 
   auth: {
     async login(email: string, password: string): Promise<{ token: string; user: User }> {
       const { data } = await axiosInstance.post('/auth/login', { email, password });
-      return data; // { success, token, user }
+      return data.data; 
     },
 
     async signup(name: string, email: string, password: string): Promise<{ token: string; user: User }> {
       const { data } = await axiosInstance.post('/auth/signup', { name, email, password });
-      return data;
+      return data.data;
     },
 
     async me(token: string): Promise<User> {
       const { data } = await axiosInstance.get('/auth/me', {
         headers: { Authorization: `Bearer ${token}` }
       });
-      return data.user;
+      return data.data;
     }
   },
 
   saved: {
     async getAll(_token?: string): Promise<SavedCollege[]> {
       const { data } = await axiosInstance.get('/saved');
-      return data;
+      return data.data;
     },
 
     async save(_token: string | undefined, collegeId: string): Promise<SavedCollege> {
       const { data } = await axiosInstance.post('/saved', { collegeId });
-      return data;
+      return data.data;
     },
 
     async remove(_token: string | undefined, collegeId: string): Promise<void> {
@@ -96,14 +131,9 @@ export const api = {
     }
   },
   ai: {
-    recommend: async (token: string, data: { stream: string, budget: string, priority: string, state?: string }) => {
-      const res = await fetch(`${API_URL}/ai/recommend`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token}` },
-        body: JSON.stringify(data)
-      });
-      if (!res.ok) throw new Error('Failed to get recommendations');
-      return res.json();
+    async recommend(_token: string, payload: { stream: string, budget: number, priority: string[], state?: string }) {
+      const { data } = await axiosInstance.post('/ai/recommend', payload);
+      return data.data;
     }
   }
 };

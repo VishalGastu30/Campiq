@@ -1,3 +1,5 @@
+// prisma/schema.prisma
+
 generator client {
   provider = "prisma-client-js"
 }
@@ -7,87 +9,153 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
-model User {
-  id        String   @id @default(cuid())
-  name      String
-  email     String   @unique
-  password  String
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
-
-  savedColleges SavedCollege[]
-
-  @@map("users")
-}
-
 model College {
-  id               String      @id @default(cuid())
-  name             String
-  slug             String      @unique
-  logoUrl          String?
-  bannerUrl        String?
-  location         String
-  city             String
-  state            String
-  type             CollegeType
-  establishedYear  Int
-  rating           Float       @default(0.0)
-  totalRatings     Int         @default(0)
-  minFees          Int
-  maxFees          Int
-  nirfRank         Int?
-  naacGrade        String?
-  placementPercent Float?
-  avgPackage       Float?
-  highestPackage   Float?
-  topRecruiters    String[]
-  about            String      @db.Text
-  website          String?
-  phone            String?
-  email            String?
-  address          String?
-  ugcApproved      Boolean     @default(false)
-  aiuMember        Boolean     @default(false)
-  createdAt        DateTime    @default(now())
-  updatedAt        DateTime    @updatedAt
+  id                String   @id @default(cuid())
+  slug              String   @unique  // e.g. "iit-madras" — used in URLs
+  name              String
+  shortName         String?  // "IIT Madras"
+  city              String
+  state             String
+  type              CollegeType  // GOVERNMENT, PRIVATE, DEEMED, CENTRAL
+  establishedYear   Int?
+  nirfRank          Int?     // NIRF 2024 rank (null if not ranked)
+  nirfScore         Float?
+  naacGrade         String?  // "A++", "A+", "A", "B++", etc.
+  affiliatedTo      String?  // "Anna University", "Autonomous", etc.
+  
+  // Fees
+  minFees           Int?     // Annual fees in INR (minimum course)
+  maxFees           Int?     // Annual fees in INR (maximum course)
+  
+  // Placements
+  placementPercent  Float?   // e.g. 92.5
+  avgPackage        Float?   // in LPA (lakhs per annum)
+  highestPackage    Float?   // in LPA
+  topRecruiters     String[] // ["Google", "Microsoft", "Amazon"]
+  
+  // Entrance Exams accepted
+  examsAccepted     String[] // ["JEE Main", "JEE Advanced", "GATE"]
+  
+  // Contact
+  website           String?
+  phone             String?
+  email             String?
+  address           String?
+  pincode           String?
+  
+  // Media
+  imageUrl          String?
+  logoUrl           String?
+  
+  // Content
+  about             String?  // 2-3 paragraph description
+  highlights        String[] // ["IIT status", "Research focus", "Global alumni"]
+  
+  // Streams/Courses offered (simplified — streams, not full course catalog)
+  streams           Stream[] // Engineering, Management, Medical, etc.
+  
+  // Stats
+  totalStudents     Int?
+  totalFaculty      Int?
+  campusArea        Float?  // in acres
+  
+  // SEO
+  metaDescription   String?
+  
+  // Timestamps
+  createdAt         DateTime @default(now())
+  updatedAt         DateTime @updatedAt
 
-  courses   Course[]
-  savedBy   SavedCollege[]
+  // Relations
+  courses           Course[]
+  reviews           Review[]
+  savedByUsers      SavedCollege[]
 
-  @@map("colleges")
+  // Indexes — critical for read-heavy filter queries
+  @@index([state])
+  @@index([type])
+  @@index([nirfRank])
+  @@index([minFees])
+  @@index([placementPercent])
+  @@index([slug])
 }
 
 enum CollegeType {
-  PRIVATE
   GOVERNMENT
+  PRIVATE
   DEEMED
-  AUTONOMOUS
+  CENTRAL
 }
+
+enum Stream {
+  ENGINEERING
+  MANAGEMENT
+  MEDICAL
+  LAW
+  ARTS
+  SCIENCE
+  COMMERCE
+  DESIGN
+  PHARMACY
+  AGRICULTURE
+}
+
 model Course {
   id          String  @id @default(cuid())
-  collegeId   String
-  name        String
-  degree      String
-  duration    Int
-  fees        Int
+  name        String  // "B.Tech Computer Science"
+  shortName   String? // "B.Tech CSE"
+  duration    Int     // in years — e.g. 4
+  degree      String  // "B.Tech", "M.Tech", "MBA", "MBBS"
+  stream      Stream
+  fees        Int?    // annual fees for this specific course in INR
   seats       Int?
-  category    String
-  eligibility String?
+  collegeId   String
+  college     College @relation(fields: [collegeId], references: [id], onDelete: Cascade)
 
-  college College @relation(fields: [collegeId], references: [id], onDelete: Cascade)
+  createdAt   DateTime @default(now())
 
-  @@map("courses")
+  @@index([collegeId])
+  @@index([stream])
+}
+
+model User {
+  id            String   @id @default(cuid())
+  email         String   @unique
+  passwordHash  String
+  name          String
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+
+  savedColleges SavedCollege[]
+  reviews       Review[]
 }
 
 model SavedCollege {
-  id        String   @id @default(cuid())
-  userId    String
-  collegeId String
-  savedAt   DateTime @default(now())
+  id         String   @id @default(cuid())
+  userId     String
+  collegeId  String
+  savedAt    DateTime @default(now())
 
-  user    User    @relation(fields: [userId], references: [id], onDelete: Cascade)
-  college College @relation(fields: [collegeId], references: [id], onDelete: Cascade)
+  user       User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  college    College  @relation(fields: [collegeId], references: [id], onDelete: Cascade)
 
-  @@unique([userId, collegeId])
-  @@map("saved_colleges")
+  @@unique([userId, collegeId])  // prevents duplicate saves
+  @@index([userId])
+}
+
+model Review {
+  id         String   @id @default(cuid())
+  userId     String
+  collegeId  String
+  rating     Float    // 1.0 to 5.0
+  title      String?
+  body       String?
+  pros       String[]
+  cons       String[]
+  createdAt  DateTime @default(now())
+
+  user       User     @relation(fields: [userId], references: [id])
+  college    College  @relation(fields: [collegeId], references: [id], onDelete: Cascade)
+
+  @@index([collegeId])
 }

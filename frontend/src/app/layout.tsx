@@ -22,6 +22,24 @@ const geistMono = Geist_Mono({
 export const metadata: Metadata = {
   title: "Campiq - Find your campus. Own your future.",
   description: "The most advanced college discovery platform for Indian students to search, compare, and shortlist their dream destinations.",
+  keywords: ["college", "university", "india", "admissions", "compare colleges", "btech", "mba", "nirf rankings", "college predictor"],
+  openGraph: {
+    title: "Campiq - The Ultimate College Discovery Platform",
+    description: "Search, compare, and decide smarter with AI-driven college recommendations and detailed insights.",
+    url: process.env.NEXT_PUBLIC_APP_URL || "https://campiq.in",
+    siteName: "Campiq",
+    locale: "en_IN",
+    type: "website",
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: "Campiq - Find your campus. Own your future.",
+    description: "Search, compare, and decide smarter.",
+  },
+  robots: {
+    index: true,
+    follow: true,
+  },
 };
 
 export default function RootLayout({

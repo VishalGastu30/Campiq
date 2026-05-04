@@ -2,7 +2,7 @@ import { useState, useEffect } from 'react';
 import { College } from '@/types';
 import { CollegeCard } from './CollegeCard';
 import { SkeletonLoader } from '@/components/ui/Skeleton';
-import { SearchX } from 'lucide-react';
+import { SearchX, Map, GraduationCap, RefreshCw } from 'lucide-react';
 import { motion } from 'framer-motion';
 import { api } from '@/lib/api';
 import { useAuth } from '@/context/AuthContext';
@@ -60,17 +60,51 @@ export function CollegeGrid({ colleges, isLoading }: CollegeGridProps) {
   if (colleges.length === 0) {
     return (
       <motion.div 
-        initial={{ opacity: 0 }}
-        animate={{ opacity: 1 }}
-        className="flex flex-col items-center justify-center py-20 px-4 text-center bg-campiq-surface border border-campiq-border rounded-2xl"
+        initial={{ opacity: 0, y: 20 }}
+        animate={{ opacity: 1, y: 0 }}
+        className="flex flex-col items-center justify-center py-24 px-4 text-center bg-campiq-surface/50 border border-campiq-border border-dashed rounded-3xl"
       >
-        <div className="w-20 h-20 bg-campiq-raised rounded-full flex items-center justify-center mb-6 border border-campiq-border">
-          <SearchX className="h-10 w-10 text-campiq-text-muted" />
+        {/* Animated Illustration */}
+        <div className="relative w-40 h-40 mb-8 flex items-center justify-center">
+          <motion.div 
+            animate={{ y: [0, -10, 0] }} 
+            transition={{ duration: 4, repeat: Infinity, ease: "easeInOut" }}
+            className="absolute z-20 w-20 h-20 bg-campiq-base rounded-2xl border border-campiq-border flex items-center justify-center shadow-xl shadow-campiq-teal/5"
+          >
+            <SearchX className="h-10 w-10 text-campiq-teal" />
+          </motion.div>
+          
+          <motion.div 
+            animate={{ y: [0, 8, 0], rotate: [-10, -5, -10] }} 
+            transition={{ duration: 5, repeat: Infinity, ease: "easeInOut", delay: 1 }}
+            className="absolute -left-4 top-4 z-10 w-14 h-14 bg-campiq-raised rounded-xl border border-campiq-border/50 flex items-center justify-center opacity-80"
+          >
+            <Map className="h-6 w-6 text-campiq-text-muted" />
+          </motion.div>
+          
+          <motion.div 
+            animate={{ y: [0, -8, 0], rotate: [10, 5, 10] }} 
+            transition={{ duration: 6, repeat: Infinity, ease: "easeInOut", delay: 0.5 }}
+            className="absolute -right-2 bottom-4 z-10 w-16 h-16 bg-campiq-raised rounded-xl border border-campiq-border/50 flex items-center justify-center opacity-80"
+          >
+            <GraduationCap className="h-7 w-7 text-campiq-text-muted" />
+          </motion.div>
+          
+          <div className="absolute inset-0 bg-campiq-teal/5 rounded-full blur-3xl -z-10" />
         </div>
-        <h3 className="text-xl font-bold text-campiq-text-primary mb-2">No colleges found</h3>
-        <p className="text-campiq-text-secondary max-w-md mx-auto">
-          We couldn't find any colleges matching your current filters. Try adjusting your search criteria or clearing some filters.
+        
+        <h3 className="text-2xl font-bold text-campiq-text-primary mb-3">No matches found</h3>
+        <p className="text-campiq-text-secondary max-w-md mx-auto mb-8 leading-relaxed">
+          We couldn't find any colleges matching your exact filters. Try broadening your search or exploring different categories.
         </p>
+        
+        <button 
+          onClick={() => window.location.href = '/explore'}
+          className="flex items-center gap-2 px-6 py-3 rounded-xl bg-campiq-raised border border-campiq-border text-campiq-text-primary hover:bg-campiq-base hover:border-campiq-teal/30 hover:text-campiq-teal transition-all font-medium"
+        >
+          <RefreshCw size={18} />
+          Reset All Filters
+        </button>
       </motion.div>
     );
   }

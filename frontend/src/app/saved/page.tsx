@@ -39,7 +39,35 @@ export default function SavedPage() {
         </div>
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
           {Array.from({ length: 3 }).map((_, i) => (
-            <SkeletonLoader key={i} height={340} borderRadius={16} />
+            <div key={i} className="rounded-xl border border-campiq-border bg-campiq-surface p-4 h-[240px] flex flex-col mt-2">
+              <div className="flex gap-3 mb-4">
+                <SkeletonLoader width={48} height={48} borderRadius={8} />
+                <div className="flex-1">
+                  <SkeletonLoader height={20} className="mb-2 w-3/4" />
+                  <SkeletonLoader height={14} className="w-1/2" />
+                </div>
+              </div>
+              
+              <div className="grid grid-cols-3 gap-0 mb-4 bg-campiq-base rounded-lg border border-campiq-border p-2">
+                <div className="border-r border-campiq-border/50 pr-2">
+                  <SkeletonLoader height={12} className="mb-2 w-1/2" />
+                  <SkeletonLoader height={18} className="w-3/4" />
+                </div>
+                <div className="border-r border-campiq-border/50 px-2">
+                  <SkeletonLoader height={12} className="mb-2 w-1/2" />
+                  <SkeletonLoader height={18} className="w-full" />
+                </div>
+                <div className="pl-2">
+                  <SkeletonLoader height={12} className="mb-2 w-1/2" />
+                  <SkeletonLoader height={18} className="w-3/4" />
+                </div>
+              </div>
+
+              <div className="mt-auto flex justify-between pt-1">
+                <SkeletonLoader width={80} height={32} borderRadius={6} />
+                <SkeletonLoader width={36} height={36} borderRadius={8} />
+              </div>
+            </div>
           ))}
         </div>
       </div>

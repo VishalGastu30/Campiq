@@ -2,7 +2,7 @@ import { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Sparkles, X, Loader2 } from 'lucide-react';
 import { Button } from '@/components/ui/Button';
-import { Input } from '@/components/ui/Input';
+import { Select } from '@/components/ui/Select';
 import { api } from '@/lib/api';
 import { useAuth } from '@/context/AuthContext';
 import { CollegeCard } from '../explore/CollegeCard';
@@ -17,7 +17,7 @@ export function AiRecommenderModal({ isOpen, onClose }: AiRecommenderModalProps)
   const { token, user } = useAuth();
   const [stream, setStream] = useState('');
   const [budget, setBudget] = useState('');
-  const [priority, setPriority] = useState('');
+  const [priorities, setPriorities] = useState<string[]>([]);
   const [isLoading, setIsLoading] = useState(false);
   const [recommendations, setRecommendations] = useState<any[]>([]);
 
@@ -27,14 +27,14 @@ export function AiRecommenderModal({ isOpen, onClose }: AiRecommenderModalProps)
       toast.error('Please login to use AI recommendations');
       return;
     }
-    if (!stream || !budget || !priority) {
-      toast.error('Please fill all fields');
+    if (!stream || !budget || priorities.length === 0) {
+      toast.error('Please fill all fields and select at least one priority');
       return;
     }
 
     setIsLoading(true);
     try {
-      const res = await api.ai.recommend(token, { stream, budget, priority });
+      const res = await api.ai.recommend(token, { stream, budget: parseInt(budget, 10), priority: priorities });
       setRecommendations(res.recommendations);
     } catch (e: any) {
       toast.error(e.message || 'Failed to get recommendations');
@@ -89,27 +89,75 @@ export function AiRecommenderModal({ isOpen, onClose }: AiRecommenderModalProps)
                 <div className="space-y-4">
                   <div>
                     <label className="block text-sm font-medium text-campiq-text-secondary mb-1">What stream are you interested in?</label>
-                    <Input 
-                      placeholder="e.g. Computer Science Engineering, BBA, Medical" 
+                    <Select 
                       value={stream}
                       onChange={(e) => setStream(e.target.value)}
+                      options={[
+                        { label: 'Select a stream', value: '' },
+                        { label: 'Engineering', value: 'ENGINEERING' },
+                        { label: 'Management', value: 'MANAGEMENT' },
+                        { label: 'Medical', value: 'MEDICAL' },
+                        { label: 'Law', value: 'LAW' },
+                        { label: 'Arts', value: 'ARTS' },
+                        { label: 'Science', value: 'SCIENCE' },
+                        { label: 'Commerce', value: 'COMMERCE' },
+                        { label: 'Design', value: 'DESIGN' },
+                        { label: 'Pharmacy', value: 'PHARMACY' },
+                        { label: 'Agriculture', value: 'AGRICULTURE' },
+                      ]}
+                      className="h-12 w-full text-base"
                     />
                   </div>
                   <div>
                     <label className="block text-sm font-medium text-campiq-text-secondary mb-1">What is your total budget for the course?</label>
-                    <Input 
-                      placeholder="e.g. Under 10 Lakhs, Under 5 Lakhs, No constraint" 
+                    <Select 
                       value={budget}
                       onChange={(e) => setBudget(e.target.value)}
+                      options={[
+                        { label: 'Select budget limit', value: '' },
+                        { label: 'Under ₹2 Lakhs', value: '200000' },
+                        { label: 'Under ₹5 Lakhs', value: '500000' },
+                        { label: 'Under ₹10 Lakhs', value: '1000000' },
+                        { label: 'Under ₹15 Lakhs', value: '1500000' },
+                        { label: 'Under ₹25 Lakhs', value: '2500000' },
+                        { label: 'No constraint', value: '0' },
+                      ]}
+                      className="h-12 w-full text-base"
                     />
                   </div>
                   <div>
-                    <label className="block text-sm font-medium text-campiq-text-secondary mb-1">What is your top priority?</label>
-                    <Input 
-                      placeholder="e.g. High placements, Top ranking, Low fees, Location" 
-                      value={priority}
-                      onChange={(e) => setPriority(e.target.value)}
-                    />
+                    <label className="block text-sm font-medium text-campiq-text-secondary mb-3">What are your top priorities? (Select one or more)</label>
+                    <div className="flex flex-wrap gap-2">
+                      {[
+                        { label: 'High Placements', value: 'placements' },
+                        { label: 'Low Fees', value: 'fees' },
+                        { label: 'Top Ranking / Prestige', value: 'ranking' },
+                        { label: 'Research & Academics', value: 'research' },
+                        { label: 'Campus Life & Facilities', value: 'campus' },
+                      ].map(opt => {
+                        const isSelected = priorities.includes(opt.value);
+                        return (
+                          <button
+                            key={opt.value}
+                            type="button"
+                            onClick={() => {
+                              setPriorities(prev => 
+                                prev.includes(opt.value) 
+                                  ? prev.filter(p => p !== opt.value) 
+                                  : [...prev, opt.value]
+                              );
+                            }}
+                            className={`px-4 py-2 rounded-xl text-sm font-medium transition-all duration-200 border ${
+                              isSelected 
+                                ? 'bg-campiq-teal/15 text-campiq-teal border-campiq-teal shadow-[0_0_10px_rgba(0,212,160,0.2)]' 
+                                : 'bg-campiq-raised text-campiq-text-secondary border-transparent hover:border-campiq-border hover:bg-campiq-surface'
+                            }`}
+                          >
+                            {opt.label}
+                          </button>
+                        );
+                      })}
+                    </div>
                   </div>
                 </div>
 

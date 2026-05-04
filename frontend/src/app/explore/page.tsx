@@ -21,12 +21,12 @@ function ExploreContent() {
   const [searchQuery, setSearchQuery] = useState(initialSearch);
   const debouncedSearch = useDebounce(searchQuery, 300);
   
-  const [sortBy, setSortBy] = useState(searchParams.get('sortBy') || 'rating');
+  const [sortBy, setSortBy] = useState(searchParams.get('sort') || 'nirfRank');
   const [filters, setFilters] = useState({
     state: searchParams.get('state') || '',
     type: searchParams.get('type') || 'All',
     minFees: parseInt(searchParams.get('minFees') || '0', 10),
-    maxFees: parseInt(searchParams.get('maxFees') || '1000000', 10),
+    maxFees: parseInt(searchParams.get('maxFees') || '5000000', 10),
     course: searchParams.get('course') || ''
   });
   
@@ -73,7 +73,7 @@ function ExploreContent() {
     if (filters.state) params.set('state', filters.state);
     if (filters.type !== 'All') params.set('type', filters.type);
     if (filters.minFees > 0) params.set('minFees', filters.minFees.toString());
-    if (filters.maxFees < 1000000) params.set('maxFees', filters.maxFees.toString());
+    if (filters.maxFees < 5000000) params.set('maxFees', filters.maxFees.toString());
     if (filters.course) params.set('course', filters.course);
     if (effectivePage > 1) params.set('page', effectivePage.toString());
     
@@ -91,7 +91,7 @@ function ExploreContent() {
       try {
         const params: CollegeQueryParams = {
           search: debouncedSearch,
-          sortBy: sortBy as any,
+          sort: sortBy as any,
           page: effectivePage,
           limit: 12,
           state: filters.state || undefined,
@@ -135,7 +135,7 @@ function ExploreContent() {
 
       <div className="flex flex-col md:flex-row gap-8 items-start">
         {/* Desktop Sidebar */}
-        <aside className="hidden md:block w-72 shrink-0 sticky top-24 h-[calc(100vh-8rem)]">
+        <aside className="hidden md:block w-60 shrink-0 sticky top-24 h-[calc(100vh-8rem)]">
           <FilterPanel meta={filterMeta} filters={filters} setFilters={setFilters} />
         </aside>
 
@@ -143,7 +143,7 @@ function ExploreContent() {
         <div className="md:hidden w-full flex justify-end -mb-4">
           <Button variant="secondary" onClick={() => setShowMobileFilters(true)} className="w-full">
             <SlidersHorizontal size={18} className="mr-2" />
-            Filters {Object.values(filters).some(v => v !== '' && v !== 'All' && v !== 0 && v !== 1000000) && '(Active)'}
+            Filters {Object.values(filters).some(v => v !== '' && v !== 'All' && v !== 0 && v !== 5000000) && '(Active)'}
           </Button>
         </div>
 

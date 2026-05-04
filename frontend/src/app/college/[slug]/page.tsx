@@ -84,16 +84,73 @@ export default function CollegeDetailPage({ params }: { params: Promise<{ slug: 
 
   if (isLoading) {
     return (
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 w-full animate-pulse">
-        <SkeletonLoader height={300} borderRadius={24} className="mb-8" />
-        <SkeletonLoader height={50} className="mb-8" />
-        <div className="grid md:grid-cols-3 gap-8">
-          <div className="md:col-span-2 space-y-4">
-            <SkeletonLoader height={150} />
-            <SkeletonLoader height={250} />
+      <div className="min-h-screen bg-campiq-base pb-24">
+        {/* Hero Section Skeleton */}
+        <div className="relative pt-8 pb-12 px-4 sm:px-6 lg:px-8 max-w-7xl mx-auto">
+          <div className="relative rounded-3xl overflow-hidden bg-campiq-surface border border-campiq-border shadow-lg">
+            <div className="h-48 md:h-64 bg-campiq-raised animate-pulse" />
+            <div className="px-6 md:px-12 pb-8 pt-0 relative z-10 flex flex-col md:flex-row gap-6 items-start md:items-end -mt-16 md:-mt-20">
+              <div className="h-32 w-32 shrink-0 rounded-2xl bg-campiq-raised border-4 border-campiq-base shadow-xl animate-pulse" />
+              <div className="flex-1 min-w-0 pt-4 md:pt-0 w-full">
+                <div className="flex gap-2 mb-3">
+                  <SkeletonLoader width={80} height={24} borderRadius={999} />
+                  <SkeletonLoader width={100} height={24} borderRadius={999} />
+                </div>
+                <SkeletonLoader width="60%" height={36} className="mb-3" />
+                <div className="flex gap-4">
+                  <SkeletonLoader width={120} height={20} />
+                  <SkeletonLoader width={140} height={20} />
+                </div>
+              </div>
+              <div className="flex gap-3 w-full md:w-auto mt-4 md:mt-0">
+                <SkeletonLoader width={140} height={40} borderRadius={8} />
+                <SkeletonLoader width={120} height={40} borderRadius={8} />
+              </div>
+            </div>
           </div>
-          <div className="space-y-4">
-            <SkeletonLoader height={300} />
+        </div>
+
+        {/* Main Content Skeleton */}
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="mb-8 border-b border-campiq-border">
+            <div className="flex space-x-8 pb-4">
+              <SkeletonLoader width={80} height={20} />
+              <SkeletonLoader width={80} height={20} />
+              <SkeletonLoader width={80} height={20} />
+            </div>
+          </div>
+          
+          <div className="grid grid-cols-1 lg:grid-cols-3 gap-8 items-start">
+            <div className="lg:col-span-2 space-y-8">
+              <section>
+                <SkeletonLoader width={200} height={28} className="mb-4" />
+                <div className="bg-campiq-surface border border-campiq-border rounded-2xl p-6">
+                  <SkeletonLoader count={4} />
+                </div>
+              </section>
+              <section>
+                <SkeletonLoader width={250} height={28} className="mb-4" />
+                <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+                  <SkeletonLoader height={100} borderRadius={12} />
+                  <SkeletonLoader height={100} borderRadius={12} />
+                  <SkeletonLoader height={100} borderRadius={12} />
+                  <SkeletonLoader height={100} borderRadius={12} />
+                </div>
+              </section>
+            </div>
+            
+            <div className="space-y-6">
+              <div className="bg-campiq-surface border border-campiq-border rounded-2xl overflow-hidden">
+                <div className="bg-campiq-raised px-6 py-4 border-b border-campiq-border">
+                  <SkeletonLoader width={100} height={20} />
+                </div>
+                <div className="p-6 space-y-5">
+                  <div><SkeletonLoader width="40%" height={16} className="mb-2"/><SkeletonLoader width="70%" height={20} /></div>
+                  <div><SkeletonLoader width="30%" height={16} className="mb-2"/><SkeletonLoader width="50%" height={20} /></div>
+                  <div><SkeletonLoader width="50%" height={16} className="mb-2"/><SkeletonLoader width="40%" height={20} /></div>
+                </div>
+              </div>
+            </div>
           </div>
         </div>
       </div>
@@ -128,8 +185,8 @@ export default function CollegeDetailPage({ params }: { params: Promise<{ slug: 
                 {college.name}
               </h1>
               <div className="flex flex-wrap items-center gap-y-2 gap-x-6 text-sm text-campiq-text-secondary">
-                <span className="flex items-center gap-1.5"><MapPin size={16} /> {college.location}</span>
-                <span className="flex items-center gap-1.5"><StarRating rating={college.rating} /> ({college.totalRatings} reviews)</span>
+                <span className="flex items-center gap-1.5"><MapPin size={16} /> {college.city}, {college.state}</span>
+                <span className="flex items-center gap-1.5"><StarRating rating={college.rating || 0} /> ({college.totalRatings || 0} reviews)</span>
                 {college.establishedYear && <span className="flex items-center gap-1.5"><Award size={16} /> Est. {college.establishedYear}</span>}
               </div>
             </div>
@@ -236,7 +293,7 @@ export default function CollegeDetailPage({ params }: { params: Promise<{ slug: 
                   <div className="space-y-6">
                     <div className="flex items-center justify-between mb-2">
                       <h2 className="text-xl font-bold text-campiq-text-primary">Programs Offered</h2>
-                      <Badge variant="teal">{college.courses.length} Courses</Badge>
+                      <Badge variant="teal">{(college.courses || []).length} Courses</Badge>
                     </div>
                     
                     <div className="overflow-x-auto rounded-2xl border border-campiq-border bg-campiq-surface shadow-sm">
@@ -251,7 +308,7 @@ export default function CollegeDetailPage({ params }: { params: Promise<{ slug: 
                           </tr>
                         </thead>
                         <tbody className="divide-y divide-campiq-border">
-                          {college.courses.map(course => (
+                          {(college.courses || []).map(course => (
                             <tr key={course.id} className="hover:bg-campiq-raised/50 transition-colors">
                               <td className="px-6 py-4">
                                 <p className="font-medium text-campiq-text-primary mb-1">{course.name}</p>
@@ -319,7 +376,7 @@ export default function CollegeDetailPage({ params }: { params: Promise<{ slug: 
                 <div>
                   <p className="text-sm text-campiq-text-muted mb-1">Total Courses</p>
                   <p className="font-medium text-campiq-text-primary flex items-center gap-2">
-                    <GraduationCap size={16} className="text-campiq-teal" /> {college.courses.length}
+                    <GraduationCap size={16} className="text-campiq-teal" /> {(college.courses || []).length}
                   </p>
                 </div>
                 <div>

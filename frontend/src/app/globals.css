@@ -2,16 +2,16 @@
 
 :root {
   --bg-base: #0C1117;
-  --bg-surface: #131B24;
-  --bg-raised: #1A2535;
+  --bg-surface: #111820;
+  --bg-raised: #161F2C;
   --accent-teal: #00D4A0;
   --accent-amber: #F5A623;
   --accent-violet: #9B7BFF;
-  --text-primary: #E8F0FC;
-  --text-secondary: #7A93B0;
-  --text-muted: #3E5470;
-  --border-light: rgba(0, 212, 160, 0.12);
-  --border-strong: rgba(0, 212, 160, 0.25);
+  --text-primary: #F0F4F8;
+  --text-secondary: #8B9CB0;
+  --text-muted: #4A5568;
+  --border-light: rgba(255, 255, 255, 0.06);
+  --border-strong: rgba(255, 255, 255, 0.12);
   --gradient-sig: linear-gradient(135deg, #00D4A0, #9B7BFF);
 }
 

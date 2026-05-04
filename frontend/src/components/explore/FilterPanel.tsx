@@ -22,7 +22,7 @@ export function FilterPanel({ meta, filters, setFilters, onCloseMobile }: Filter
       state: '',
       type: 'All',
       minFees: 0,
-      maxFees: 1000000,
+      maxFees: 5000000,
       course: ''
     });
   };
@@ -55,28 +55,21 @@ export function FilterPanel({ meta, filters, setFilters, onCloseMobile }: Filter
             {collapsed['state'] ? <ChevronDown size={16} /> : <ChevronUp size={16} />}
           </button>
           {!collapsed['state'] && (
-            <div className="space-y-2 max-h-48 overflow-y-auto pr-2 custom-scrollbar">
-              <label className="flex items-center gap-2 cursor-pointer group">
-                <input 
-                  type="radio" 
-                  name="state"
-                  checked={filters.state === ''}
-                  onChange={() => setFilters({ ...filters, state: '' })}
-                  className="appearance-none w-4 h-4 rounded-full border border-campiq-text-muted checked:border-[4px] checked:border-campiq-teal transition-all"
-                />
-                <span className="text-sm text-campiq-text-secondary group-hover:text-campiq-text-primary">All States</span>
-              </label>
+            <div className="flex flex-wrap gap-2 max-h-48 overflow-y-auto pr-2 custom-scrollbar">
+              <button 
+                onClick={() => setFilters({ ...filters, state: '' })}
+                className={`px-3 py-1.5 rounded-md text-xs font-medium transition-all border ${filters.state === '' ? 'bg-campiq-teal/15 border-campiq-teal/50 text-campiq-teal shadow-[0_0_8px_rgba(0,212,160,0.1)]' : 'bg-campiq-base border-campiq-border text-campiq-text-secondary hover:border-campiq-border-strong hover:text-campiq-text-primary'}`}
+              >
+                All States
+              </button>
               {meta.states.map(state => (
-                <label key={state} className="flex items-center gap-2 cursor-pointer group">
-                  <input 
-                    type="radio" 
-                    name="state"
-                    checked={filters.state === state}
-                    onChange={() => setFilters({ ...filters, state })}
-                    className="appearance-none w-4 h-4 rounded-full border border-campiq-text-muted checked:border-[4px] checked:border-campiq-teal transition-all"
-                  />
-                  <span className="text-sm text-campiq-text-secondary group-hover:text-campiq-text-primary">{state}</span>
-                </label>
+                <button 
+                  key={state}
+                  onClick={() => setFilters({ ...filters, state })}
+                  className={`px-3 py-1.5 rounded-md text-xs font-medium transition-all border ${filters.state === state ? 'bg-campiq-teal/15 border-campiq-teal/50 text-campiq-teal shadow-[0_0_8px_rgba(0,212,160,0.1)]' : 'bg-campiq-base border-campiq-border text-campiq-text-secondary hover:border-campiq-border-strong hover:text-campiq-text-primary'}`}
+                >
+                  {state}
+                </button>
               ))}
             </div>
           )}
@@ -92,28 +85,21 @@ export function FilterPanel({ meta, filters, setFilters, onCloseMobile }: Filter
             {collapsed['type'] ? <ChevronDown size={16} /> : <ChevronUp size={16} />}
           </button>
           {!collapsed['type'] && (
-            <div className="space-y-2">
-              <label className="flex items-center gap-2 cursor-pointer group">
-                <input 
-                  type="radio" 
-                  name="type"
-                  checked={filters.type === 'All'}
-                  onChange={() => setFilters({ ...filters, type: 'All' })}
-                  className="appearance-none w-4 h-4 rounded-full border border-campiq-text-muted checked:border-[4px] checked:border-campiq-teal transition-all"
-                />
-                <span className="text-sm text-campiq-text-secondary group-hover:text-campiq-text-primary">All Types</span>
-              </label>
+            <div className="flex flex-wrap gap-2">
+              <button 
+                onClick={() => setFilters({ ...filters, type: 'All' })}
+                className={`px-3 py-1.5 rounded-md text-xs font-medium transition-all border ${filters.type === 'All' ? 'bg-campiq-teal/15 border-campiq-teal/50 text-campiq-teal shadow-[0_0_8px_rgba(0,212,160,0.1)]' : 'bg-campiq-base border-campiq-border text-campiq-text-secondary hover:border-campiq-border-strong hover:text-campiq-text-primary'}`}
+              >
+                All Types
+              </button>
               {meta.types.map(type => (
-                <label key={type} className="flex items-center gap-2 cursor-pointer group">
-                  <input 
-                    type="radio" 
-                    name="type"
-                    checked={filters.type === type}
-                    onChange={() => setFilters({ ...filters, type })}
-                    className="appearance-none w-4 h-4 rounded-full border border-campiq-text-muted checked:border-[4px] checked:border-campiq-teal transition-all"
-                  />
-                  <span className="text-sm text-campiq-text-secondary group-hover:text-campiq-text-primary capitalize">{type.toLowerCase()}</span>
-                </label>
+                <button 
+                  key={type}
+                  onClick={() => setFilters({ ...filters, type })}
+                  className={`px-3 py-1.5 rounded-md text-xs font-medium transition-all border capitalize ${filters.type === type ? 'bg-campiq-teal/15 border-campiq-teal/50 text-campiq-teal shadow-[0_0_8px_rgba(0,212,160,0.1)]' : 'bg-campiq-base border-campiq-border text-campiq-text-secondary hover:border-campiq-border-strong hover:text-campiq-text-primary'}`}
+                >
+                  {type.toLowerCase()}
+                </button>
               ))}
             </div>
           )}
@@ -129,19 +115,33 @@ export function FilterPanel({ meta, filters, setFilters, onCloseMobile }: Filter
             {collapsed['fees'] ? <ChevronDown size={16} /> : <ChevronUp size={16} />}
           </button>
           {!collapsed['fees'] && (
-            <div className="space-y-4 px-1">
-              <input 
-                type="range" 
-                min={0} 
-                max={1000000} 
-                step={50000}
-                value={filters.maxFees}
-                onChange={(e) => setFilters({ ...filters, maxFees: parseInt(e.target.value) })}
-                className="w-full accent-campiq-teal h-1.5 bg-campiq-raised rounded-lg appearance-none cursor-pointer"
-              />
-              <div className="flex justify-between text-xs text-campiq-text-muted">
-                <span>₹0</span>
-                <span>₹{(filters.maxFees / 100000).toFixed(1)}L</span>
+            <div className="space-y-6 px-1 pt-2 pb-2">
+              <div className="relative">
+                <input 
+                  type="range" 
+                  min={0} 
+                  max={5000000} 
+                  step={50000}
+                  value={filters.maxFees}
+                  onChange={(e) => setFilters({ ...filters, maxFees: parseInt(e.target.value) })}
+                  className="w-full h-1.5 bg-campiq-raised rounded-lg appearance-none cursor-pointer focus:outline-none [&::-webkit-slider-thumb]:appearance-none [&::-webkit-slider-thumb]:w-5 [&::-webkit-slider-thumb]:h-5 [&::-webkit-slider-thumb]:bg-campiq-base [&::-webkit-slider-thumb]:border-2 [&::-webkit-slider-thumb]:border-campiq-teal [&::-webkit-slider-thumb]:rounded-full [&::-webkit-slider-thumb]:shadow-[0_0_10px_rgba(0,212,160,0.3)] [&::-webkit-slider-thumb]:transition-transform [&::-webkit-slider-thumb]:hover:scale-110"
+                  style={{
+                    background: `linear-gradient(to right, #00d4a0 ${(filters.maxFees / 5000000) * 100}%, rgba(255,255,255,0.05) ${(filters.maxFees / 5000000) * 100}%)`
+                  }}
+                />
+              </div>
+              <div className="flex justify-between items-center bg-campiq-raised/50 rounded-lg p-3 border border-campiq-border/50">
+                <div className="flex flex-col">
+                  <span className="text-[10px] text-campiq-text-muted uppercase tracking-wider font-semibold">Min</span>
+                  <span className="text-sm font-bold text-campiq-text-primary font-mono">₹0</span>
+                </div>
+                <div className="h-4 w-px bg-campiq-border"></div>
+                <div className="flex flex-col text-right">
+                  <span className="text-[10px] text-campiq-text-muted uppercase tracking-wider font-semibold">Max Limit</span>
+                  <span className="text-sm font-bold text-campiq-teal font-mono">
+                    {filters.maxFees === 5000000 ? 'No Limit' : `₹${(filters.maxFees / 100000).toFixed(1)}L`}
+                  </span>
+                </div>
               </div>
             </div>
           )}
@@ -157,28 +157,21 @@ export function FilterPanel({ meta, filters, setFilters, onCloseMobile }: Filter
             {collapsed['course'] ? <ChevronDown size={16} /> : <ChevronUp size={16} />}
           </button>
           {!collapsed['course'] && (
-            <div className="space-y-2">
-              <label className="flex items-center gap-2 cursor-pointer group">
-                <input 
-                  type="radio" 
-                  name="course"
-                  checked={filters.course === ''}
-                  onChange={() => setFilters({ ...filters, course: '' })}
-                  className="appearance-none w-4 h-4 rounded-full border border-campiq-text-muted checked:border-[4px] checked:border-campiq-teal transition-all"
-                />
-                <span className="text-sm text-campiq-text-secondary group-hover:text-campiq-text-primary">All Programs</span>
-              </label>
-              {meta.courseCategories.map(cat => (
-                <label key={cat} className="flex items-center gap-2 cursor-pointer group">
-                  <input 
-                    type="radio" 
-                    name="course"
-                    checked={filters.course === cat}
-                    onChange={() => setFilters({ ...filters, course: cat })}
-                    className="appearance-none w-4 h-4 rounded-full border border-campiq-text-muted checked:border-[4px] checked:border-campiq-teal transition-all"
-                  />
-                  <span className="text-sm text-campiq-text-secondary group-hover:text-campiq-text-primary">{cat}</span>
-                </label>
+            <div className="flex flex-wrap gap-2">
+              <button 
+                onClick={() => setFilters({ ...filters, course: '' })}
+                className={`px-3 py-1.5 rounded-md text-xs font-medium transition-all border ${filters.course === '' ? 'bg-campiq-teal/15 border-campiq-teal/50 text-campiq-teal shadow-[0_0_8px_rgba(0,212,160,0.1)]' : 'bg-campiq-base border-campiq-border text-campiq-text-secondary hover:border-campiq-border-strong hover:text-campiq-text-primary'}`}
+              >
+                All Programs
+              </button>
+              {meta.streams.map(stream => (
+                <button 
+                  key={stream}
+                  onClick={() => setFilters({ ...filters, course: stream })}
+                  className={`px-3 py-1.5 rounded-md text-xs font-medium transition-all border ${filters.course === stream ? 'bg-campiq-teal/15 border-campiq-teal/50 text-campiq-teal shadow-[0_0_8px_rgba(0,212,160,0.1)]' : 'bg-campiq-base border-campiq-border text-campiq-text-secondary hover:border-campiq-border-strong hover:text-campiq-text-primary'}`}
+                >
+                  {stream}
+                </button>
               ))}
             </div>
           )}

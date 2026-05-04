@@ -1,132 +1,86 @@
-import { PrismaClient, CollegeType } from '@prisma/client';
-import bcrypt from 'bcryptjs';
-import fs from 'fs';
-import path from 'path';
-import { parse } from 'csv-parse/sync';
+// prisma/seed.ts
+import { PrismaClient, CollegeType, Stream } from '@prisma/client';
+import * as fs from 'fs';
+import * as path from 'path';
+import * as csv from 'csv-parse/sync';
 
 const prisma = new PrismaClient();
 
 async function main() {
-  console.log('Clearing database...');
-  await prisma.course.deleteMany();
+  console.log('🌱 Seeding database...');
+  
+  // Clear existing data
   await prisma.savedCollege.deleteMany();
+  await prisma.review.deleteMany();
+  await prisma.course.deleteMany();
   await prisma.college.deleteMany();
   await prisma.user.deleteMany();
 
-  console.log('Seeding Demo User...');
-  const passwordHash = await bcrypt.hash('DemoPass123', 10);
-  await prisma.user.create({
-    data: {
-      name: 'Demo User',
-      email: 'demo@campiq.in',
-      password: passwordHash
-    }
-  });
-
+  // Load CSV
   const csvPath = path.join(__dirname, 'data', 'colleges.csv');
-  console.log(`Reading colleges from ${csvPath}...`);
-  
-  const fileContent = fs.readFileSync(csvPath, 'utf-8');
-  const records: any[] = parse(fileContent, {
-    columns: true,
-    skip_empty_lines: true
-  });
-
-  console.log(`Parsed ${records.length} records. Seeding colleges...`);
-  
-  let successCount = 0;
-  
-  for (const record of records) {
-    try {
-      // Clean data
-      const minFees = parseInt(record.min_fees) || 0;
-      const maxFees = parseInt(record.max_fees) || 0;
-      const rating = parseFloat(record.rating) || 3.5;
-      const totalRatings = parseInt(record.total_ratings) || 0;
-      const establishedYear = parseInt(record.established_year) || 2000;
-      const placementPercent = parseFloat(record.placement_percent) || 0;
-      const avgPackage = parseFloat(record.avg_package) || 0;
-      const highestPackage = parseFloat(record.highest_package) || 0;
-      const nirfRank = record.nirf_rank ? parseInt(record.nirf_rank) : null;
-      
-      const recruiters = record.top_recruiters ? record.top_recruiters.split('|').map((s: string) => s.trim()).filter(Boolean) : [];
-      
-      let type: CollegeType = 'PRIVATE';
-      if (['GOVERNMENT', 'PRIVATE', 'DEEMED', 'AUTONOMOUS'].includes(record.type)) {
-        type = record.type as CollegeType;
-      }
-      
-      const courses = [];
-      if (record.courses_offered) {
-        const courseNames = record.courses_offered.split('|');
-        for (const cName of courseNames) {
-          const cat = record.nirf_category || 'General';
-          courses.push({
-            name: cName.trim(),
-            degree: cName.trim().split(' ')[0],
-            duration: cName.includes('Tech') ? 4 : (cName.includes('MBA') ? 2 : 3),
-            fees: minFees,
-            seats: 120,
-            category: cat,
-            eligibility: 'Merit/Entrance'
-          });
-        }
-      } else {
-         courses.push({
-            name: `B.Tech ${record.nirf_category || 'Engineering'}`,
-            degree: 'B.Tech',
-            duration: 4,
-            fees: minFees,
-            seats: 120,
-            category: record.nirf_category || 'Engineering',
-            eligibility: 'Entrance'
-          });
-      }
-
-      await prisma.college.upsert({
-        where: { slug: record.slug },
-        update: {},
-        create: {
-          name: record.name,
-          slug: record.slug,
-          city: record.city,
-          state: record.state,
-          location: `${record.city}, ${record.state}`,
-          type,
-          establishedYear,
-          rating,
-          totalRatings,
-          minFees,
-          maxFees,
-          nirfRank,
-          naacGrade: record.naac_grade || null,
-          placementPercent,
-          avgPackage,
-          highestPackage,
-          topRecruiters: recruiters,
-          about: record.about || `${record.name} is a leading college in ${record.city}.`,
-          website: record.website || null,
-          ugcApproved: record.ugc_approved === 'True' || record.ugc_approved === 'true',
-          aiuMember: false,
-          courses: {
-            create: courses
-          }
-        }
-      });
-      successCount++;
-    } catch (e) {
-      console.error(`Failed to seed ${record.name}:`, e);
-    }
+  if (!fs.existsSync(csvPath)) {
+    console.error(`❌ CSV file not found at ${csvPath}`);
+    return;
   }
-  
-  console.log(`✅ Seeded ${successCount} colleges successfully!`);
+  const raw = fs.readFileSync(csvPath, 'utf-8');
+  const rows = csv.parse(raw, { columns: true, skip_empty_lines: true });
+
+  for (const r of rows) {
+    const row = r as any;
+    // Generate slug from name — e.g. "IIT Madras" → "iit-madras"
+    const name = row.name || 'Unknown';
+    const slug = name
+      .toLowerCase()
+      .replace(/[^a-z0-9\s-]/g, '')
+      .replace(/\s+/g, '-')
+      .replace(/-+/g, '-')
+      .trim();
+
+    // Fix map streams if it's empty
+    const rawStreams = row.streams || row.courses || '';
+    const streams = rawStreams.split(',').map((s: string) => {
+        const parsed = s.trim().toUpperCase();
+        return parsed as Stream;
+    }).filter((s: Stream) => Object.values(Stream).includes(s));
+
+    let type: CollegeType = CollegeType.PRIVATE;
+    const rawType = row.type ? row.type.toUpperCase() : '';
+    if (Object.values(CollegeType).includes(rawType as CollegeType)) {
+        type = rawType as CollegeType;
+    } else if (rawType.includes('GOV')) {
+        type = CollegeType.GOVERNMENT;
+    } else if (rawType.includes('DEEM')) {
+        type = CollegeType.DEEMED;
+    } else if (rawType.includes('CENTRAL')) {
+        type = CollegeType.CENTRAL;
+    }
+
+    await prisma.college.upsert({
+      where: { slug },
+      update: {},
+      create: {
+        slug,
+        name: name,
+        city: row.city || 'Unknown',
+        state: row.state || 'Unknown',
+        type: type,
+        nirfRank: row.nirf_rank ? parseInt(row.nirf_rank) : null,
+        minFees: row.min_fees ? parseInt(row.min_fees) : null,
+        maxFees: row.max_fees ? parseInt(row.max_fees) : null,
+        placementPercent: row.placement_percent ? parseFloat(row.placement_percent) : null,
+        avgPackage: row.avg_package ? parseFloat(row.avg_package) : null,
+        naacGrade: row.naac_grade || null,
+        streams: streams.length > 0 ? streams : [Stream.ENGINEERING],
+        examsAccepted: row.exams ? row.exams.split(',').map((e: string) => e.trim()) : [],
+        about: row.about || null,
+        imageUrl: row.image_url || null,
+      },
+    });
+  }
+
+  console.log(`✅ Seeded ${rows.length} colleges`);
 }
 
 main()
-  .catch((e) => {
-    console.error(e);
-    process.exit(1);
-  })
-  .finally(async () => {
-    await prisma.$disconnect();
-  });
+  .catch(console.error)
+  .finally(() => prisma.$disconnect());

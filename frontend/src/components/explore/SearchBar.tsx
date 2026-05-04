@@ -11,10 +11,10 @@ interface SearchBarProps {
 
 export function SearchBar({ searchQuery, setSearchQuery, sortBy, setSortBy, totalResults }: SearchBarProps) {
   const sortOptions = [
-    { label: 'Highest Rated', value: 'rating' },
     { label: 'NIRF Ranking', value: 'nirfRank' },
     { label: 'Lowest Fees', value: 'fees' },
     { label: 'Highest Placement %', value: 'placement' },
+    { label: 'College Name', value: 'name' },
   ];
 
   return (
