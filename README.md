@@ -178,6 +178,8 @@ We use Render to host the Node.js/Express API.
    - `FRONTEND_URL`: `https://your-vercel-frontend.vercel.app`
    - `NODE_ENV`: `production`
 
+> **Note**: To prevent Render's free tier from spinning down (cold starts), you can use [UptimeRobot](https://uptimerobot.com/) to ping the `https://your-render-app.onrender.com/health` endpoint every 5 minutes.
+
 ### 3. Frontend (Vercel)
 We use Vercel to host the Next.js frontend.
 1. Import your GitHub repository into [Vercel](https://vercel.com).

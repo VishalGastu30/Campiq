@@ -25,9 +25,11 @@ async function main() {
   const raw = fs.readFileSync(csvPath, 'utf-8');
   const rows = csv.parse(raw, { columns: true, skip_empty_lines: true });
 
+  const collegesToInsert = [];
+
   for (const r of rows) {
     const row = r as any;
-    // Generate slug from name — e.g. "IIT Madras" → "iit-madras"
+    // Generate slug from name
     const name = row.name || 'Unknown';
     const slug = name
       .toLowerCase()
@@ -55,30 +57,39 @@ async function main() {
         type = CollegeType.CENTRAL;
     }
 
-    await prisma.college.upsert({
-      where: { slug },
-      update: {},
-      create: {
-        slug,
-        name: name,
-        city: row.city || 'Unknown',
-        state: row.state || 'Unknown',
-        type: type,
-        nirfRank: row.nirf_rank ? parseInt(row.nirf_rank) : null,
-        minFees: row.min_fees ? parseInt(row.min_fees) : null,
-        maxFees: row.max_fees ? parseInt(row.max_fees) : null,
-        placementPercent: row.placement_percent ? parseFloat(row.placement_percent) : null,
-        avgPackage: row.avg_package ? parseFloat(row.avg_package) : null,
-        naacGrade: row.naac_grade || null,
-        streams: streams.length > 0 ? streams : [Stream.ENGINEERING],
-        examsAccepted: row.exams ? row.exams.split(',').map((e: string) => e.trim()) : [],
-        about: row.about || null,
-        imageUrl: row.image_url || null,
-      },
+    collegesToInsert.push({
+      slug,
+      name: name,
+      city: row.city || 'Unknown',
+      state: row.state || 'Unknown',
+      type: type,
+      nirfRank: row.nirf_rank ? parseInt(row.nirf_rank) : null,
+      minFees: row.min_fees ? parseInt(row.min_fees) : null,
+      maxFees: row.max_fees ? parseInt(row.max_fees) : null,
+      placementPercent: row.placement_percent ? parseFloat(row.placement_percent) : null,
+      avgPackage: row.avg_package ? parseFloat(row.avg_package) : null,
+      naacGrade: row.naac_grade || null,
+      streams: streams.length > 0 ? streams : [Stream.ENGINEERING],
+      examsAccepted: row.exams ? row.exams.split(',').map((e: string) => e.trim()) : [],
+      about: row.about || null,
+      imageUrl: row.image_url || null,
     });
   }
 
-  console.log(`✅ Seeded ${rows.length} colleges`);
+  // Deduplicate by slug just in case
+  const uniqueSlugs = new Set();
+  const uniqueColleges = collegesToInsert.filter(c => {
+      if (uniqueSlugs.has(c.slug)) return false;
+      uniqueSlugs.add(c.slug);
+      return true;
+  });
+
+  await prisma.college.createMany({
+      data: uniqueColleges,
+      skipDuplicates: true
+  });
+
+  console.log(`✅ Seeded ${uniqueColleges.length} colleges`);
 }
 
 main()
