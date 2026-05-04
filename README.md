@@ -150,18 +150,42 @@ npm run dev
 \`\`\`
 The frontend will be available at `http://localhost:3000` and the backend at `http://localhost:4000`.
 
-## 🌐 API Endpoints
+## 🌍 Deployment Guide
 
-| Method | Endpoint | Description | Auth Required |
-|--------|----------|-------------|---------------|
-| `POST` | `/api/auth/register` | Register new user | No |
-| `POST` | `/api/auth/login` | Login user | No |
-| `GET`  | `/api/colleges` | Get paginated/filtered colleges | No |
-| `GET`  | `/api/colleges/:slug` | Get college details | No |
-| `GET`  | `/api/colleges/compare` | Get data for comparison | No |
-| `GET`  | `/api/saved` | Get user's saved colleges | Yes |
-| `POST` | `/api/saved` | Save a college | Yes |
-| `POST` | `/api/ai/recommend` | Get AI college matches | Yes |
+Campiq is designed to be easily deployed across modern serverless and cloud providers.
+
+### 1. Database (Neon.tech)
+We use Neon for Serverless PostgreSQL.
+1. Create a project on [Neon](https://neon.tech).
+2. Copy your connection string.
+3. Push your database schema and seed it:
+```bash
+cd backend
+DATABASE_URL="your-neon-connection-string" npx prisma db push --accept-data-loss
+DATABASE_URL="your-neon-connection-string" npx ts-node prisma/seed.ts
+```
+
+### 2. Backend (Render)
+We use Render to host the Node.js/Express API.
+1. Create a new Web Service on [Render](https://render.com), pointing to your GitHub repo.
+2. Set the **Root Directory** to `backend`.
+3. Set the **Build Command** to: `npm install && npx prisma generate && npm run build`
+4. Set the **Start Command** to: `npm start`
+5. Add the following **Environment Variables**:
+   - `DATABASE_URL`: Your Neon connection string.
+   - `JWT_SECRET`: A secure random string.
+   - `GROQ_API_KEY`: Your Groq API key (for the AI recommender).
+   - `FRONTEND_URL`: `https://your-vercel-frontend.vercel.app`
+   - `NODE_ENV`: `production`
+
+### 3. Frontend (Vercel)
+We use Vercel to host the Next.js frontend.
+1. Import your GitHub repository into [Vercel](https://vercel.com).
+2. Set the **Framework Preset** to Next.js.
+3. Set the **Root Directory** to `frontend`.
+4. Add the following **Environment Variables**:
+   - `NEXT_PUBLIC_API_URL`: `https://your-render-backend.onrender.com/api` (Ensure there is no trailing slash and `/api` is included).
+5. Deploy!
 
 ## 👨‍💻 Built By
 
