@@ -87,10 +87,10 @@ export function PlacementChart({ collegeId }: Props) {
                   color: '#E8F0FC',
                   fontSize: '12px',
                 }}
-                formatter={(value: any, name: string) => [
+                formatter={((value: number, name: string) => [
                   name === 'placement' ? `${value}%` : `₹${value}L`,
                   name === 'placement' ? 'Placement %' : 'Avg Package'
-                ]}
+                ]) as never}
               />
               <Area
                 type="monotone"
