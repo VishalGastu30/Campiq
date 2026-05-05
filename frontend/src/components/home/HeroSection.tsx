@@ -6,6 +6,7 @@ import { useRouter } from 'next/navigation';
 import { Button } from '@/components/ui/Button';
 import { Search, MapPin, BookOpen, ArrowRight, Sparkles } from 'lucide-react';
 import { AiRecommenderModal } from './AiRecommenderModal';
+import { ConstellationCanvas } from './ConstellationCanvas';
 
 const placeholders = [
   { text: "Search by college name...", icon: <Search size={20} /> },
@@ -40,13 +41,13 @@ export function HeroSection() {
 
   return (
     <section className="relative min-h-[90vh] flex flex-col items-center justify-center pt-20 pb-32 px-4 overflow-hidden">
-      {/* Background elements */}
+      {/* Constellation Canvas Background */}
+      <ConstellationCanvas />
+
+      {/* Ambient orbs */}
       <div className="absolute inset-0 z-0 pointer-events-none">
-        <div className="absolute top-1/4 left-1/4 w-[500px] h-[500px] bg-campiq-teal/10 rounded-full blur-[120px] animate-orb-drift" />
-        <div className="absolute bottom-1/4 right-1/4 w-[600px] h-[600px] bg-campiq-violet/10 rounded-full blur-[120px] animate-orb-drift" style={{ animationDelay: '-7.5s' }} />
-        
-        {/* Subtle grid pattern */}
-        <div className="absolute inset-0 bg-[url('data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSI0MCIgaGVpZ2h0PSI0MCI+CgkJPGNpcmNsZSBjeD0iMjAiIGN5PSIyMCIgcj0iMSIgZmlsbD0icmdiYSgyNTUsIDI1NSwgMjU1LCAwLjA1KSIvPgoJPC9zdmc+')] opacity-50" />
+        <div className="absolute top-1/4 left-1/4 w-[500px] h-[500px] bg-campiq-teal/8 rounded-full blur-[140px] animate-orb-drift" />
+        <div className="absolute bottom-1/4 right-1/4 w-[600px] h-[600px] bg-campiq-violet/8 rounded-full blur-[140px] animate-orb-drift" style={{ animationDelay: '-7.5s' }} />
       </div>
 
       <div className="relative z-10 w-full max-w-4xl mx-auto text-center">
