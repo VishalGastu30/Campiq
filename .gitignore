@@ -43,3 +43,11 @@ npm-debug.log*
 yarn-debug.log*
 yarn-error.log*
 .vercel
+
+# Project planning and scripts
+LOOM_VIDEO_SCRIPT.md
+drastic.md
+generate_colleges.py
+overhaul.md
+full_implemented.md
+
