@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { useAuth } from '@/context/AuthContext';
+import { useAuth, useRequireAuth } from '@/context/AuthContext';
 import { api } from '@/lib/api';
 import { College } from '@/types';
 import { SwipeableCard } from '@/components/explore/SwipeableCard';
@@ -13,6 +13,7 @@ import toast from 'react-hot-toast';
 
 export default function DecideModePage() {
   const { user, token } = useAuth();
+  const { isLoading: authLoading } = useRequireAuth();
   const [colleges, setColleges] = useState<College[]>([]);
   const [currentIndex, setCurrentIndex] = useState(0);
   const [shortlisted, setShortlisted] = useState<College[]>([]);
@@ -23,7 +24,7 @@ export default function DecideModePage() {
   useEffect(() => {
     const fetchColleges = async () => {
       try {
-        const res = await api.colleges.getAll({ sort: 'nirfRank', limit: 20, page: 1 });
+        const res = await api.colleges.getAll({ sort: 'nirfRank', limit: 1000, page: 1 });
         setColleges(res.data);
       } catch {
         toast.error('Failed to load colleges');
@@ -42,8 +43,8 @@ export default function DecideModePage() {
     if (user && token) {
       try {
         await api.saved.save(token, college.id);
-      } catch {
-        // silently fail
+      } catch (err) {
+        console.error('Failed to save college:', err);
       }
     }
 
@@ -87,12 +88,16 @@ export default function DecideModePage() {
     setIsComplete(false);
   };
 
-  if (isLoading) {
+  if (authLoading || isLoading) {
     return (
       <div className="min-h-screen flex items-center justify-center">
-        <div className="text-campiq-teal animate-pulse text-lg">Loading colleges...</div>
+        <div className="text-campiq-teal animate-pulse text-lg">Loading...</div>
       </div>
     );
+  }
+
+  if (!user) {
+    return null; // Will redirect via useRequireAuth
   }
 
   if (isComplete) {

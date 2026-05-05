@@ -68,7 +68,7 @@ export function DecisionDashboard() {
   if (!stats) return null;
 
   const metrics = [
-    { value: stats.totalColleges, label: 'Colleges Tracked', suffix: '+', icon: Database },
+    { value: Math.floor(stats.totalColleges / 10) * 10, label: 'Colleges Tracked', suffix: '+', icon: Database },
     { value: stats.totalStreams, label: 'Streams Covered', suffix: '', icon: GraduationCap },
     { value: Math.round(stats.avgPlacement), label: 'Avg. Placement', suffix: '%', icon: TrendingUp },
     { value: stats.totalStates, label: 'States & UTs', suffix: '', icon: MapPin },
