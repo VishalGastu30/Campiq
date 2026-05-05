@@ -36,6 +36,7 @@ export function Navbar() {
     { name: 'Home', href: '/' },
     { name: 'Explore', href: '/explore' },
     { name: 'Compare', href: '/compare', badge: compareIds.length > 0 ? compareIds.length : undefined },
+    { name: 'Find My College', href: '/find-my-college' },
   ];
 
   return (

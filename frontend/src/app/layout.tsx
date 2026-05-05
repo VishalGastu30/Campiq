@@ -7,6 +7,7 @@ import { Navbar } from "@/components/layout/Navbar";
 import { Footer } from "@/components/layout/Footer";
 import { PageWrapper } from "@/components/layout/PageWrapper";
 import { FloatingCompareBar } from "@/components/compare/FloatingCompareBar";
+import { MobileBottomNav } from "@/components/layout/MobileBottomNav";
 import { Toaster } from "react-hot-toast";
 
 const geistSans = Geist({
@@ -50,7 +51,7 @@ export default function RootLayout({
   return (
     <html lang="en" className="dark" style={{ colorScheme: 'dark' }}>
       <body
-        className={`${geistSans.variable} ${geistMono.variable} antialiased bg-campiq-base text-campiq-text-primary min-h-screen flex flex-col overflow-x-hidden`}
+        className={`${geistSans.variable} ${geistMono.variable} antialiased bg-campiq-base text-campiq-text-primary min-h-screen flex flex-col overflow-x-hidden pb-16 md:pb-0`}
       >
         <AuthProvider>
           <CompareProvider>
@@ -59,6 +60,7 @@ export default function RootLayout({
               {children}
             </PageWrapper>
             <FloatingCompareBar />
+            <MobileBottomNav />
             <Footer />
             <Toaster 
               position="bottom-right"
