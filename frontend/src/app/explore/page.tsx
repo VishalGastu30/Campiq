@@ -27,7 +27,7 @@ function ExploreContent() {
     type: searchParams.get('type') || 'All',
     minFees: parseInt(searchParams.get('minFees') || '0', 10),
     maxFees: parseInt(searchParams.get('maxFees') || '5000000', 10),
-    course: searchParams.get('course') || ''
+    course: searchParams.get('course') || searchParams.get('stream') || ''
   });
   
   const [page, setPage] = useState(parseInt(searchParams.get('page') || '1', 10));

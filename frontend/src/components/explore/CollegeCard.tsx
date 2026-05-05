@@ -112,7 +112,7 @@ export function CollegeCard({ college, index = 0, savedCollegeIds, onSavedChange
             <div className="flex flex-col justify-center pl-2">
               <span className="text-[10px] uppercase tracking-wider text-campiq-text-muted mb-0.5 font-medium">Placement</span>
               <span className="font-mono text-campiq-text-primary font-bold text-sm leading-tight">
-                {college.rating ? `${(college.rating / 5 * 100).toFixed(0)}%` : '-'}
+                {college.placementPercent ? `${college.placementPercent}%` : '-'}
               </span>
             </div>
           </div>

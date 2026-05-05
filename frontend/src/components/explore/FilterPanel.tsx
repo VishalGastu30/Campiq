@@ -2,6 +2,7 @@ import { ChevronUp, ChevronDown, X } from 'lucide-react';
 import { useState } from 'react';
 import { FilterMeta } from '@/types';
 import { Button } from '@/components/ui/Button';
+import * as Slider from '@radix-ui/react-slider';
 
 interface FilterPanelProps {
   meta: FilterMeta | null;
@@ -105,7 +106,7 @@ export function FilterPanel({ meta, filters, setFilters, onCloseMobile }: Filter
           )}
         </div>
 
-        {/* Fees Range Filter */}
+        {/* Fees Range Filter — Dual-Handle Radix Slider */}
         <div className="pt-4 border-t border-campiq-border">
           <button 
             className="flex items-center justify-between w-full font-medium text-campiq-text-primary mb-3"
@@ -115,31 +116,35 @@ export function FilterPanel({ meta, filters, setFilters, onCloseMobile }: Filter
             {collapsed['fees'] ? <ChevronDown size={16} /> : <ChevronUp size={16} />}
           </button>
           {!collapsed['fees'] && (
-            <div className="space-y-6 px-1 pt-2 pb-2">
-              <div className="relative">
-                <input 
-                  type="range" 
-                  min={0} 
-                  max={5000000} 
-                  step={50000}
-                  value={filters.maxFees}
-                  onChange={(e) => setFilters({ ...filters, maxFees: parseInt(e.target.value) })}
-                  className="w-full h-1.5 bg-campiq-raised rounded-lg appearance-none cursor-pointer focus:outline-none [&::-webkit-slider-thumb]:appearance-none [&::-webkit-slider-thumb]:w-5 [&::-webkit-slider-thumb]:h-5 [&::-webkit-slider-thumb]:bg-campiq-base [&::-webkit-slider-thumb]:border-2 [&::-webkit-slider-thumb]:border-campiq-teal [&::-webkit-slider-thumb]:rounded-full [&::-webkit-slider-thumb]:shadow-[0_0_10px_rgba(0,212,160,0.3)] [&::-webkit-slider-thumb]:transition-transform [&::-webkit-slider-thumb]:hover:scale-110"
-                  style={{
-                    background: `linear-gradient(to right, #00d4a0 ${(filters.maxFees / 5000000) * 100}%, rgba(255,255,255,0.05) ${(filters.maxFees / 5000000) * 100}%)`
-                  }}
-                />
-              </div>
+            <div className="space-y-5 px-1 pt-2 pb-2">
+              <Slider.Root
+                className="relative flex items-center select-none touch-none w-full h-5"
+                value={[filters.minFees, filters.maxFees]}
+                min={0}
+                max={5000000}
+                step={50000}
+                minStepsBetweenThumbs={1}
+                onValueChange={([min, max]) => setFilters({ ...filters, minFees: min, maxFees: max })}
+              >
+                <Slider.Track className="bg-campiq-base relative grow rounded-full h-[4px]">
+                  <Slider.Range className="absolute bg-campiq-teal rounded-full h-full" />
+                </Slider.Track>
+                <Slider.Thumb className="block w-5 h-5 bg-white rounded-[10px] shadow-[0_2px_10px_rgba(0,0,0,0.3)] hover:bg-campiq-teal focus:outline-none focus:shadow-[0_0_0_4px_rgba(0,212,160,0.2)] transition-colors cursor-grab active:cursor-grabbing" />
+                <Slider.Thumb className="block w-5 h-5 bg-white rounded-[10px] shadow-[0_2px_10px_rgba(0,0,0,0.3)] hover:bg-campiq-teal focus:outline-none focus:shadow-[0_0_0_4px_rgba(0,212,160,0.2)] transition-colors cursor-grab active:cursor-grabbing" />
+              </Slider.Root>
+
               <div className="flex justify-between items-center bg-campiq-raised/50 rounded-lg p-3 border border-campiq-border/50">
                 <div className="flex flex-col">
                   <span className="text-[10px] text-campiq-text-muted uppercase tracking-wider font-semibold">Min</span>
-                  <span className="text-sm font-bold text-campiq-text-primary font-mono">₹0</span>
+                  <span className="text-sm font-bold text-campiq-text-primary font-mono">
+                    {filters.minFees === 0 ? '₹0' : `₹${(filters.minFees / 100000).toFixed(1)}L`}
+                  </span>
                 </div>
                 <div className="h-4 w-px bg-campiq-border"></div>
                 <div className="flex flex-col text-right">
-                  <span className="text-[10px] text-campiq-text-muted uppercase tracking-wider font-semibold">Max Limit</span>
+                  <span className="text-[10px] text-campiq-text-muted uppercase tracking-wider font-semibold">Max</span>
                   <span className="text-sm font-bold text-campiq-teal font-mono">
-                    {filters.maxFees === 5000000 ? 'No Limit' : `₹${(filters.maxFees / 100000).toFixed(1)}L`}
+                    {filters.maxFees >= 5000000 ? 'No Limit' : `₹${(filters.maxFees / 100000).toFixed(1)}L`}
                   </span>
                 </div>
               </div>
