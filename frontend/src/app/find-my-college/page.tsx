@@ -284,7 +284,7 @@ export default function FindMyCollegePage() {
             })}
           </div>
 
-          <div className="flex justify-center gap-4">
+          <div className="flex flex-col sm:flex-row justify-center gap-3 sm:gap-4">
             <Button variant="secondary" onClick={() => { setResults(null); setStep(0); }}>
               <span className="inline-flex items-center gap-2"><RotateCcw size={16} /> Start Over</span>
             </Button>
@@ -306,20 +306,20 @@ export default function FindMyCollegePage() {
         <div className="max-w-3xl mx-auto px-4 py-8">
           <div className="flex items-center justify-between">
             {STEP_LABELS.map((label, i) => (
-              <div key={label} className="flex items-center gap-3">
-                <div className={`w-10 h-10 rounded-full flex items-center justify-center text-sm font-bold transition-all duration-300 ${
+              <div key={label} className="flex items-center gap-1.5 sm:gap-3">
+                <div className={`w-8 h-8 sm:w-10 sm:h-10 rounded-full flex items-center justify-center text-xs sm:text-sm font-bold transition-all duration-300 ${
                   i < step ? 'bg-campiq-teal text-campiq-base' :
                   i === step ? 'bg-campiq-teal/20 text-campiq-teal border-2 border-campiq-teal' :
                   'bg-campiq-raised text-campiq-text-muted'
                 }`}>
-                  {i < step ? <CheckCircle2 size={20} /> : i + 1}
+                  {i < step ? <CheckCircle2 size={16} className="sm:w-5 sm:h-5" /> : i + 1}
                 </div>
                 <span className={`text-sm font-semibold hidden sm:block ${
                   i <= step ? 'text-campiq-text-primary' : 'text-campiq-text-muted'
                 }`}>
                   {label}
                 </span>
-                {i < 3 && <div className={`w-10 sm:w-20 h-[2px] mx-2 transition-colors ${i < step ? 'bg-campiq-teal' : 'bg-campiq-border'}`} />}
+                {i < 3 && <div className={`w-6 sm:w-10 md:w-20 h-[2px] mx-1 sm:mx-2 transition-colors ${i < step ? 'bg-campiq-teal' : 'bg-campiq-border'}`} />}
               </div>
             ))}
           </div>

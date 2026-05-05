@@ -61,7 +61,7 @@ export function VerdictBox({ colleges }: Props) {
         Campiq Verdict
       </h3>
       
-      <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+      <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-4">
         <VerdictItem label="Best Overall" college={verdict.bestOverall} icon={<Star size={16} />} color="text-yellow-400" />
         <VerdictItem label="Best Value" college={verdict.bestValue} icon={<Gem size={16} />} color="text-cyan-400" />
         <VerdictItem label="Best Placement" college={verdict.bestPlacement} icon={<TrendingUp size={16} />} color="text-green-400" />

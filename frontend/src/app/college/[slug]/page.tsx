@@ -174,7 +174,7 @@ export default function CollegeDetailPage({ params }: { params: Promise<{ slug: 
           
           <div className="px-6 md:px-12 pb-8 pt-0 relative z-10 flex flex-col md:flex-row gap-6 items-start md:items-end -mt-16 md:-mt-20">
             {/* Logo */}
-            <div className="h-32 w-32 shrink-0 rounded-2xl bg-campiq-surface border-4 border-campiq-base shadow-xl flex items-center justify-center text-4xl font-bold text-campiq-teal">
+            <div className="h-24 w-24 md:h-32 md:w-32 shrink-0 rounded-2xl bg-campiq-surface border-4 border-campiq-base shadow-xl flex items-center justify-center text-3xl md:text-4xl font-bold text-campiq-teal">
               {getInitials(college.name)}
             </div>
             
@@ -338,15 +338,15 @@ export default function CollegeDetailPage({ params }: { params: Promise<{ slug: 
                     <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
                       <div className="bg-campiq-surface border border-campiq-border rounded-2xl p-6 text-center">
                         <p className="text-sm font-medium text-campiq-text-muted mb-2 uppercase tracking-wide">Placement Rate</p>
-                        <p className="text-4xl font-bold text-campiq-teal">{college.placementPercent || 'N/A'}%</p>
+                        <p className="text-3xl md:text-4xl font-bold text-campiq-teal">{college.placementPercent || 'N/A'}%</p>
                       </div>
                       <div className="bg-campiq-surface border border-campiq-border rounded-2xl p-6 text-center">
                         <p className="text-sm font-medium text-campiq-text-muted mb-2 uppercase tracking-wide">Avg Package</p>
-                        <p className="text-4xl font-bold text-campiq-text-primary">{formatLPA(college.avgPackage)}</p>
+                        <p className="text-3xl md:text-4xl font-bold text-campiq-text-primary">{formatLPA(college.avgPackage)}</p>
                       </div>
                       <div className="bg-campiq-surface border border-campiq-border rounded-2xl p-6 text-center">
                         <p className="text-sm font-medium text-campiq-text-muted mb-2 uppercase tracking-wide">Highest Package</p>
-                        <p className="text-4xl font-bold text-campiq-amber">{college.highestPackage ? `₹${college.highestPackage} Cr` : 'N/A'}</p>
+                        <p className="text-3xl md:text-4xl font-bold text-campiq-amber">{college.highestPackage ? `₹${college.highestPackage} Cr` : 'N/A'}</p>
                       </div>
                     </div>
 

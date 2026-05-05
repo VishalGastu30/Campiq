@@ -86,7 +86,7 @@ export function CollegeCard({ college, index = 0, savedCollegeIds, onSavedChange
                 </Link>
               </h3>
               <div className="flex flex-wrap items-center text-xs text-campiq-text-muted mt-1 gap-1.5">
-                <span className="truncate max-w-[120px]" title={`${college.city}, ${college.state}`}><MapPin size={12} className="inline mr-0.5 -mt-0.5"/>{college.city}, {college.state}</span>
+                <span className="truncate max-w-[140px] sm:max-w-[180px] lg:max-w-[220px]" title={`${college.city}, ${college.state}`}><MapPin size={12} className="inline mr-0.5 -mt-0.5"/>{college.city}, {college.state}</span>
                 <span className="w-1 h-1 rounded-full bg-campiq-text-muted/50" />
                 <span className="text-[10px] uppercase font-bold tracking-wider text-campiq-violet px-1.5 py-0.5 bg-campiq-violet/10 rounded-sm">
                   {college.type}

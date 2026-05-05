@@ -77,7 +77,7 @@ export function HeroSection() {
         </motion.div>
 
         {/* Headline */}
-        <h1 className="text-5xl md:text-7xl font-bold tracking-tight mb-6">
+        <h1 className="text-3xl sm:text-5xl md:text-7xl font-bold tracking-tight mb-6">
           {titleWords.map((word, i) => (
             <motion.span
               key={i}
