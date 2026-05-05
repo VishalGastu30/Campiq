@@ -58,6 +58,25 @@ model College {
   totalStudents     Int?
   totalFaculty      Int?
   campusArea        Float?  // in acres
+  campusSize        String?
+  
+  // Accommodation
+  hostelAvailable   Boolean? @default(false)
+  girlsHostel       Boolean? @default(false)
+
+  // AI & Data source
+  aiSummary         String?  @db.Text
+  aiSummaryAt       DateTime?
+  dataSource        String?  @default("NIRF 2024")
+  dataUpdatedAt     DateTime? @default(now())
+
+  // Additional stats
+  rating            Float?   @default(3.5)
+  totalRatings      Int?     @default(100)
+  location          String?
+  ugcApproved       Boolean? @default(false)
+  lat               Float?
+  lng               Float?
   
   // SEO
   metaDescription   String?
@@ -70,6 +89,7 @@ model College {
   courses           Course[]
   reviews           Review[]
   savedByUsers      SavedCollege[]
+  placementYears    PlacementYear[]
 
   // Indexes — critical for read-heavy filter queries
   @@index([state])
@@ -78,6 +98,7 @@ model College {
   @@index([minFees])
   @@index([placementPercent])
   @@index([slug])
+  @@index([rating])
 }
 
 enum CollegeType {
@@ -85,6 +106,7 @@ enum CollegeType {
   PRIVATE
   DEEMED
   CENTRAL
+  AUTONOMOUS
 }
 
 enum Stream {
@@ -158,4 +180,23 @@ model Review {
   college    College  @relation(fields: [collegeId], references: [id], onDelete: Cascade)
 
   @@index([collegeId])
+}
+
+model PlacementYear {
+  id          String  @id @default(cuid())
+  collegeId   String
+  year        Int     // 2022, 2023, 2024
+  percentage  Float
+  avgPackage  Float?
+  college     College @relation(fields: [collegeId], references: [id], onDelete: Cascade)
+  @@unique([collegeId, year])
+}
+
+model Shortlist {
+  id         String   @id @default(cuid())
+  token      String   @unique @default(cuid()) // short random token
+  collegeIds String[] // array of college IDs
+  userId     String?  // optional — for logged-in users
+  createdAt  DateTime @default(now())
+  expiresAt  DateTime // 30 days from creation
 }
