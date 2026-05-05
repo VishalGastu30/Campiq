@@ -1,5 +1,7 @@
 import { College } from '@/types';
 import { motion } from 'framer-motion';
+import { Star, Gem, TrendingUp, Trophy } from 'lucide-react';
+import { ReactNode } from 'react';
 
 interface Props {
   colleges: College[];
@@ -33,10 +35,10 @@ export function VerdictBox({ colleges }: Props) {
   
   if (!verdict) return null;
 
-  const VerdictItem = ({ label, college, icon }: { label: string, college: College, icon: string }) => (
+  const VerdictItem = ({ label, college, icon, color }: { label: string, college: College, icon: ReactNode, color: string }) => (
     <div className="flex flex-col gap-2 p-4 rounded-xl bg-campiq-base border border-campiq-border/50">
       <div className="flex items-center gap-2 text-campiq-text-secondary text-sm font-medium">
-        <span>{icon}</span>
+        <span className={color}>{icon}</span>
         {label}
       </div>
       <div className="font-bold text-campiq-teal line-clamp-2 leading-tight" title={college.name}>
@@ -60,10 +62,10 @@ export function VerdictBox({ colleges }: Props) {
       </h3>
       
       <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-        <VerdictItem label="Best Overall" college={verdict.bestOverall} icon="⭐" />
-        <VerdictItem label="Best Value" college={verdict.bestValue} icon="💎" />
-        <VerdictItem label="Best Placement" college={verdict.bestPlacement} icon="📈" />
-        <VerdictItem label="Best Ranked" college={verdict.bestRanked} icon="🏆" />
+        <VerdictItem label="Best Overall" college={verdict.bestOverall} icon={<Star size={16} />} color="text-yellow-400" />
+        <VerdictItem label="Best Value" college={verdict.bestValue} icon={<Gem size={16} />} color="text-cyan-400" />
+        <VerdictItem label="Best Placement" college={verdict.bestPlacement} icon={<TrendingUp size={16} />} color="text-green-400" />
+        <VerdictItem label="Best Ranked" college={verdict.bestRanked} icon={<Trophy size={16} />} color="text-amber-400" />
       </div>
     </motion.div>
   );

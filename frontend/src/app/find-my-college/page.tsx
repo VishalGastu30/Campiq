@@ -8,22 +8,25 @@ import { CollegeCard } from '@/components/explore/CollegeCard';
 import { useAuth } from '@/context/AuthContext';
 import {
   Sparkles, ArrowRight, ArrowLeft, Loader2, MapPin,
-  GraduationCap, Wallet, Target, CheckCircle2
+  GraduationCap, Wallet, Target, CheckCircle2, Globe,
+  Cog, BarChart3, Building2, Scale, Palette, FlaskConical,
+  Briefcase, PenTool, Pill, Wheat,
+  Trophy, Medal, SlidersHorizontal, RotateCcw, Search
 } from 'lucide-react';
 import toast from 'react-hot-toast';
 import Link from 'next/link';
 
 const STREAMS = [
-  { value: 'ENGINEERING', label: 'Engineering', icon: '⚙️' },
-  { value: 'MANAGEMENT', label: 'Management', icon: '📊' },
-  { value: 'MEDICAL', label: 'Medical', icon: '🏥' },
-  { value: 'LAW', label: 'Law', icon: '⚖️' },
-  { value: 'ARTS', label: 'Arts', icon: '🎨' },
-  { value: 'SCIENCE', label: 'Science', icon: '🔬' },
-  { value: 'COMMERCE', label: 'Commerce', icon: '💼' },
-  { value: 'DESIGN', label: 'Design', icon: '✏️' },
-  { value: 'PHARMACY', label: 'Pharmacy', icon: '💊' },
-  { value: 'AGRICULTURE', label: 'Agriculture', icon: '🌾' },
+  { value: 'ENGINEERING', label: 'Engineering', Icon: Cog },
+  { value: 'MANAGEMENT', label: 'Management', Icon: BarChart3 },
+  { value: 'MEDICAL', label: 'Medical', Icon: Building2 },
+  { value: 'LAW', label: 'Law', Icon: Scale },
+  { value: 'ARTS', label: 'Arts', Icon: Palette },
+  { value: 'SCIENCE', label: 'Science', Icon: FlaskConical },
+  { value: 'COMMERCE', label: 'Commerce', Icon: Briefcase },
+  { value: 'DESIGN', label: 'Design', Icon: PenTool },
+  { value: 'PHARMACY', label: 'Pharmacy', Icon: Pill },
+  { value: 'AGRICULTURE', label: 'Agriculture', Icon: Wheat },
 ];
 
 const BUDGETS = [
@@ -36,11 +39,11 @@ const BUDGETS = [
 ];
 
 const PRIORITIES = [
-  { value: 'placements', label: 'High Placements', icon: Target, description: 'Best ROI and career outcomes' },
-  { value: 'fees', label: 'Low Fees', icon: Wallet, description: 'Affordable without compromise' },
-  { value: 'ranking', label: 'Top Ranking', icon: GraduationCap, description: 'NIRF-ranked prestige colleges' },
-  { value: 'research', label: 'Research Focus', icon: Sparkles, description: 'Strong R&D and publications' },
-  { value: 'campus', label: 'Campus & Life', icon: MapPin, description: 'Facilities, hostel, culture' },
+  { value: 'placements', label: 'High Placements', Icon: Target, description: 'Best ROI and career outcomes' },
+  { value: 'fees', label: 'Low Fees', Icon: Wallet, description: 'Affordable without compromise' },
+  { value: 'ranking', label: 'Top Ranking', Icon: GraduationCap, description: 'NIRF-ranked prestige colleges' },
+  { value: 'research', label: 'Research Focus', Icon: Sparkles, description: 'Strong R&D and publications' },
+  { value: 'campus', label: 'Campus & Life', Icon: MapPin, description: 'Facilities, hostel, culture' },
 ];
 
 const STATES = [
@@ -60,6 +63,7 @@ export default function FindMyCollegePage() {
   const [isLoading, setIsLoading] = useState(false);
   const [results, setResults] = useState<any[] | null>(null);
   const [aiAnalysis, setAiAnalysis] = useState('');
+  const [showRefine, setShowRefine] = useState(false);
 
   const { token, user } = useAuth();
   const router = useRouter();
@@ -113,7 +117,11 @@ export default function FindMyCollegePage() {
     );
   };
 
+  // Results view
   if (results) {
+    // Sort results by matchScore descending for leaderboard
+    const sorted = [...results].sort((a, b) => (b.matchScore || 0) - (a.matchScore || 0));
+
     return (
       <div className="min-h-screen bg-campiq-base py-12 px-4">
         <div className="max-w-6xl mx-auto">
@@ -134,6 +142,80 @@ export default function FindMyCollegePage() {
             </p>
           </motion.div>
 
+          {/* Refine Search Panel */}
+          <motion.div
+            initial={{ opacity: 0, y: 12 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.1 }}
+            className="mb-8"
+          >
+            <button
+              onClick={() => setShowRefine(!showRefine)}
+              className="inline-flex items-center gap-2 px-4 py-2.5 rounded-xl bg-campiq-surface border border-campiq-border text-sm font-medium text-campiq-text-primary hover:border-campiq-teal/40 transition-all"
+            >
+              <SlidersHorizontal size={16} className="text-campiq-teal" />
+              Refine Search
+            </button>
+
+            <AnimatePresence>
+              {showRefine && (
+                <motion.div
+                  initial={{ opacity: 0, height: 0 }}
+                  animate={{ opacity: 1, height: 'auto' }}
+                  exit={{ opacity: 0, height: 0 }}
+                  className="overflow-hidden"
+                >
+                  <div className="mt-4 p-6 bg-campiq-surface border border-campiq-border rounded-2xl grid grid-cols-1 md:grid-cols-4 gap-6">
+                    {/* Stream */}
+                    <div>
+                      <label className="text-xs text-campiq-text-muted uppercase tracking-wider font-semibold mb-2 block">Stream</label>
+                      <select
+                        value={stream}
+                        onChange={(e) => setStream(e.target.value)}
+                        className="w-full px-3 py-2.5 rounded-lg bg-campiq-base border border-campiq-border text-campiq-text-primary text-sm focus:border-campiq-teal outline-none"
+                      >
+                        {STREAMS.map(s => <option key={s.value} value={s.value}>{s.label}</option>)}
+                      </select>
+                    </div>
+                    {/* Budget */}
+                    <div>
+                      <label className="text-xs text-campiq-text-muted uppercase tracking-wider font-semibold mb-2 block">Max Budget</label>
+                      <select
+                        value={budget ?? ''}
+                        onChange={(e) => setBudget(Number(e.target.value))}
+                        className="w-full px-3 py-2.5 rounded-lg bg-campiq-base border border-campiq-border text-campiq-text-primary text-sm focus:border-campiq-teal outline-none"
+                      >
+                        {BUDGETS.map(b => <option key={b.value} value={b.value}>{b.label}</option>)}
+                      </select>
+                    </div>
+                    {/* State */}
+                    <div>
+                      <label className="text-xs text-campiq-text-muted uppercase tracking-wider font-semibold mb-2 block">Location</label>
+                      <select
+                        value={state}
+                        onChange={(e) => setState(e.target.value)}
+                        className="w-full px-3 py-2.5 rounded-lg bg-campiq-base border border-campiq-border text-campiq-text-primary text-sm focus:border-campiq-teal outline-none"
+                      >
+                        <option value="">All India</option>
+                        {STATES.filter(Boolean).map(s => <option key={s} value={s}>{s}</option>)}
+                      </select>
+                    </div>
+                    {/* Re-search */}
+                    <div className="flex items-end">
+                      <Button onClick={handleSubmit} disabled={isLoading} className="w-full">
+                        {isLoading ? (
+                          <span className="inline-flex items-center gap-2"><Loader2 className="animate-spin" size={16} /> Searching...</span>
+                        ) : (
+                          <span className="inline-flex items-center gap-2"><Search size={16} /> Re-search</span>
+                        )}
+                      </Button>
+                    </div>
+                  </div>
+                </motion.div>
+              )}
+            </AnimatePresence>
+          </motion.div>
+
           {aiAnalysis && (
             <motion.div
               initial={{ opacity: 0, y: 12 }}
@@ -149,37 +231,67 @@ export default function FindMyCollegePage() {
             </motion.div>
           )}
 
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-10">
-            {results.map((rec: any, idx: number) => (
-              <motion.div
-                key={rec.college?.id || idx}
-                initial={{ opacity: 0, y: 20 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ delay: 0.1 * idx }}
-                className="flex flex-col gap-4"
-              >
-                <div className="bg-campiq-teal/10 border border-campiq-teal/20 rounded-2xl p-4 relative overflow-hidden">
-                  <div className="absolute -right-4 -top-4 w-16 h-16 bg-campiq-teal/20 rounded-full blur-xl" />
-                  <span className="text-sm font-bold text-campiq-teal flex items-center gap-1.5 mb-2">
-                    <Sparkles size={14} /> {rec.matchScore}% Match
-                  </span>
-                  <p className="text-sm text-campiq-text-primary leading-relaxed">{rec.reason}</p>
-                </div>
-                {rec.college && (
-                  <div className="flex-1">
-                    <CollegeCard college={rec.college} index={idx} />
+          {/* Leaderboard Cards */}
+          <div className="space-y-5 mb-12">
+            {sorted.map((rec: any, idx: number) => {
+              const rankIcon = idx === 0 ? <Trophy size={18} className="text-yellow-400" /> :
+                               idx === 1 ? <Medal size={18} className="text-gray-300" /> :
+                               idx === 2 ? <Medal size={18} className="text-amber-600" /> : null;
+
+              return (
+                <motion.div
+                  key={rec.college?.id || idx}
+                  initial={{ opacity: 0, y: 20 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ delay: 0.08 * idx }}
+                  className="bg-campiq-surface border border-campiq-border rounded-2xl overflow-hidden hover:border-campiq-teal/30 transition-all"
+                >
+                  <div className="flex flex-col lg:flex-row">
+                    {/* Rank + Match Score sidebar */}
+                    <div className="flex lg:flex-col items-center justify-center gap-3 px-6 py-4 lg:py-6 lg:min-w-[100px] bg-campiq-raised/50 border-b lg:border-b-0 lg:border-r border-campiq-border">
+                      <div className="flex items-center gap-2">
+                        {rankIcon || <span className="text-xl font-bold text-campiq-text-muted">#{idx + 1}</span>}
+                        {idx < 3 && <span className="text-xl font-bold text-campiq-text-primary">#{idx + 1}</span>}
+                      </div>
+                      <div className="flex items-center gap-1.5 px-3 py-1 rounded-full bg-campiq-teal/15 border border-campiq-teal/30">
+                        <Sparkles size={12} className="text-campiq-teal" />
+                        <span className="text-sm font-bold text-campiq-teal">{rec.matchScore}%</span>
+                      </div>
+                    </div>
+
+                    {/* Content */}
+                    <div className="flex-1 p-5 lg:p-6">
+                      <div className="flex flex-col lg:flex-row gap-5">
+                        {/* College Card inline */}
+                        {rec.college && (
+                          <div className="lg:w-[320px] shrink-0">
+                            <CollegeCard college={rec.college} index={idx} />
+                          </div>
+                        )}
+                        {/* AI Reason */}
+                        <div className="flex-1 flex flex-col justify-center">
+                          <div className="flex items-center gap-2 mb-2">
+                            <Sparkles size={14} className="text-campiq-violet" />
+                            <span className="text-xs font-bold text-campiq-text-muted uppercase tracking-wider">AI Insight</span>
+                          </div>
+                          <p className="text-sm text-campiq-text-secondary leading-relaxed">{rec.reason}</p>
+                        </div>
+                      </div>
+                    </div>
                   </div>
-                )}
-              </motion.div>
-            ))}
+                </motion.div>
+              );
+            })}
           </div>
 
           <div className="flex justify-center gap-4">
             <Button variant="secondary" onClick={() => { setResults(null); setStep(0); }}>
-              <ArrowLeft size={16} className="mr-2" /> Start Over
+              <span className="inline-flex items-center gap-2"><RotateCcw size={16} /> Start Over</span>
             </Button>
             <Link href="/explore">
-              <Button>Explore All Colleges</Button>
+              <Button>
+                <span className="inline-flex items-center gap-2"><Search size={16} /> Explore All Colleges</span>
+              </Button>
             </Link>
           </div>
         </div>
@@ -191,23 +303,23 @@ export default function FindMyCollegePage() {
     <div className="min-h-screen bg-campiq-base flex flex-col">
       {/* Progress bar */}
       <div className="w-full bg-campiq-surface border-b border-campiq-border">
-        <div className="max-w-3xl mx-auto px-4 py-6">
-          <div className="flex items-center justify-between mb-4">
+        <div className="max-w-3xl mx-auto px-4 py-8">
+          <div className="flex items-center justify-between">
             {STEP_LABELS.map((label, i) => (
-              <div key={label} className="flex items-center gap-2">
-                <div className={`w-8 h-8 rounded-full flex items-center justify-center text-xs font-bold transition-all duration-300 ${
+              <div key={label} className="flex items-center gap-3">
+                <div className={`w-10 h-10 rounded-full flex items-center justify-center text-sm font-bold transition-all duration-300 ${
                   i < step ? 'bg-campiq-teal text-campiq-base' :
-                  i === step ? 'bg-campiq-teal/20 text-campiq-teal border border-campiq-teal' :
+                  i === step ? 'bg-campiq-teal/20 text-campiq-teal border-2 border-campiq-teal' :
                   'bg-campiq-raised text-campiq-text-muted'
                 }`}>
-                  {i < step ? <CheckCircle2 size={16} /> : i + 1}
+                  {i < step ? <CheckCircle2 size={20} /> : i + 1}
                 </div>
-                <span className={`text-sm font-medium hidden sm:block ${
+                <span className={`text-sm font-semibold hidden sm:block ${
                   i <= step ? 'text-campiq-text-primary' : 'text-campiq-text-muted'
                 }`}>
                   {label}
                 </span>
-                {i < 3 && <div className={`w-8 sm:w-16 h-[2px] mx-2 transition-colors ${i < step ? 'bg-campiq-teal' : 'bg-campiq-border'}`} />}
+                {i < 3 && <div className={`w-10 sm:w-20 h-[2px] mx-2 transition-colors ${i < step ? 'bg-campiq-teal' : 'bg-campiq-border'}`} />}
               </div>
             ))}
           </div>
@@ -221,24 +333,24 @@ export default function FindMyCollegePage() {
             {/* Step 1: Stream */}
             {step === 0 && (
               <motion.div key="step-0" initial={{ opacity: 0, x: 30 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0, x: -30 }} transition={{ duration: 0.3 }}>
-                <div className="text-center mb-8">
-                  <GraduationCap size={40} className="text-campiq-teal mx-auto mb-4" />
+                <div className="text-center mb-10">
+                  <GraduationCap size={44} className="text-campiq-teal mx-auto mb-4" />
                   <h2 className="text-2xl md:text-3xl font-bold text-campiq-text-primary mb-2">What do you want to study?</h2>
                   <p className="text-campiq-text-secondary">Choose the field that excites you the most</p>
                 </div>
-                <div className="grid grid-cols-2 sm:grid-cols-3 gap-3">
+                <div className="grid grid-cols-2 sm:grid-cols-3 gap-4">
                   {STREAMS.map(s => (
                     <button
                       key={s.value}
                       onClick={() => setStream(s.value)}
-                      className={`p-4 rounded-xl text-left border transition-all duration-200 ${
+                      className={`p-5 rounded-xl text-left border transition-all duration-200 ${
                         stream === s.value
                           ? 'bg-campiq-teal/15 border-campiq-teal/50 shadow-[0_0_15px_rgba(0,212,160,0.15)]'
                           : 'bg-campiq-surface border-campiq-border hover:border-campiq-teal/30'
                       }`}
                     >
-                      <span className="text-xl mb-1 block">{s.icon}</span>
-                      <span className={`text-sm font-semibold ${stream === s.value ? 'text-campiq-teal' : 'text-campiq-text-primary'}`}>
+                      <s.Icon size={24} className={`mb-2 ${stream === s.value ? 'text-campiq-teal' : 'text-campiq-text-muted'}`} />
+                      <span className={`text-sm font-semibold block ${stream === s.value ? 'text-campiq-teal' : 'text-campiq-text-primary'}`}>
                         {s.label}
                       </span>
                     </button>
@@ -250,17 +362,17 @@ export default function FindMyCollegePage() {
             {/* Step 2: Budget */}
             {step === 1 && (
               <motion.div key="step-1" initial={{ opacity: 0, x: 30 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0, x: -30 }} transition={{ duration: 0.3 }}>
-                <div className="text-center mb-8">
-                  <Wallet size={40} className="text-campiq-amber mx-auto mb-4" />
-                  <h2 className="text-2xl md:text-3xl font-bold text-campiq-text-primary mb-2">What's your budget?</h2>
-                  <p className="text-campiq-text-secondary">Annual fees you're comfortable with</p>
+                <div className="text-center mb-10">
+                  <Wallet size={44} className="text-campiq-amber mx-auto mb-4" />
+                  <h2 className="text-2xl md:text-3xl font-bold text-campiq-text-primary mb-2">What&apos;s your budget?</h2>
+                  <p className="text-campiq-text-secondary">Annual fees you&apos;re comfortable with</p>
                 </div>
-                <div className="grid grid-cols-2 sm:grid-cols-3 gap-3">
+                <div className="grid grid-cols-2 sm:grid-cols-3 gap-4">
                   {BUDGETS.map(b => (
                     <button
                       key={b.value}
                       onClick={() => setBudget(b.value)}
-                      className={`p-4 rounded-xl text-left border transition-all duration-200 ${
+                      className={`p-5 rounded-xl text-left border transition-all duration-200 ${
                         budget === b.value
                           ? 'bg-campiq-amber/15 border-campiq-amber/50 shadow-[0_0_15px_rgba(245,166,35,0.15)]'
                           : 'bg-campiq-surface border-campiq-border hover:border-campiq-amber/30'
@@ -279,8 +391,8 @@ export default function FindMyCollegePage() {
             {/* Step 3: Priorities */}
             {step === 2 && (
               <motion.div key="step-2" initial={{ opacity: 0, x: 30 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0, x: -30 }} transition={{ duration: 0.3 }}>
-                <div className="text-center mb-8">
-                  <Target size={40} className="text-campiq-violet mx-auto mb-4" />
+                <div className="text-center mb-10">
+                  <Target size={44} className="text-campiq-violet mx-auto mb-4" />
                   <h2 className="text-2xl md:text-3xl font-bold text-campiq-text-primary mb-2">What matters most?</h2>
                   <p className="text-campiq-text-secondary">Select one or more priorities</p>
                 </div>
@@ -291,14 +403,14 @@ export default function FindMyCollegePage() {
                       <button
                         key={p.value}
                         onClick={() => togglePriority(p.value)}
-                        className={`w-full flex items-center gap-4 p-4 rounded-xl border transition-all duration-200 text-left ${
+                        className={`w-full flex items-center gap-4 p-5 rounded-xl border transition-all duration-200 text-left ${
                           isSelected
                             ? 'bg-campiq-violet/10 border-campiq-violet/40 shadow-[0_0_15px_rgba(155,123,255,0.1)]'
                             : 'bg-campiq-surface border-campiq-border hover:border-campiq-violet/30'
                         }`}
                       >
-                        <div className={`p-2 rounded-lg ${isSelected ? 'bg-campiq-violet/20' : 'bg-campiq-raised'}`}>
-                          <p.icon size={20} className={isSelected ? 'text-campiq-violet' : 'text-campiq-text-muted'} />
+                        <div className={`p-2.5 rounded-lg ${isSelected ? 'bg-campiq-violet/20' : 'bg-campiq-raised'}`}>
+                          <p.Icon size={22} className={isSelected ? 'text-campiq-violet' : 'text-campiq-text-muted'} />
                         </div>
                         <div className="flex-1">
                           <span className={`font-semibold text-sm block ${isSelected ? 'text-campiq-violet' : 'text-campiq-text-primary'}`}>
@@ -306,7 +418,7 @@ export default function FindMyCollegePage() {
                           </span>
                           <span className="text-xs text-campiq-text-muted">{p.description}</span>
                         </div>
-                        {isSelected && <CheckCircle2 size={20} className="text-campiq-violet" />}
+                        {isSelected && <CheckCircle2 size={22} className="text-campiq-violet" />}
                       </button>
                     );
                   })}
@@ -317,27 +429,28 @@ export default function FindMyCollegePage() {
             {/* Step 4: Location */}
             {step === 3 && (
               <motion.div key="step-3" initial={{ opacity: 0, x: 30 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0, x: -30 }} transition={{ duration: 0.3 }}>
-                <div className="text-center mb-8">
-                  <MapPin size={40} className="text-campiq-teal mx-auto mb-4" />
+                <div className="text-center mb-10">
+                  <MapPin size={44} className="text-campiq-teal mx-auto mb-4" />
                   <h2 className="text-2xl md:text-3xl font-bold text-campiq-text-primary mb-2">Any location preference?</h2>
                   <p className="text-campiq-text-secondary">Optional — leave empty to search everywhere</p>
                 </div>
-                <div className="grid grid-cols-2 sm:grid-cols-3 gap-3">
+                <div className="grid grid-cols-2 sm:grid-cols-3 gap-4">
                   <button
                     onClick={() => setState('')}
                     className={`p-4 rounded-xl text-center border transition-all duration-200 ${
                       state === '' ? 'bg-campiq-teal/15 border-campiq-teal/50' : 'bg-campiq-surface border-campiq-border hover:border-campiq-teal/30'
                     }`}
                   >
+                    <Globe size={20} className={`mx-auto mb-1 ${state === '' ? 'text-campiq-teal' : 'text-campiq-text-muted'}`} />
                     <span className={`text-sm font-semibold ${state === '' ? 'text-campiq-teal' : 'text-campiq-text-primary'}`}>
-                      🌍 All India
+                      All India
                     </span>
                   </button>
                   {STATES.filter(Boolean).map(s => (
                     <button
                       key={s}
                       onClick={() => setState(s)}
-                      className={`p-3 rounded-xl text-center border transition-all duration-200 ${
+                      className={`p-4 rounded-xl text-center border transition-all duration-200 ${
                         state === s ? 'bg-campiq-teal/15 border-campiq-teal/50' : 'bg-campiq-surface border-campiq-border hover:border-campiq-teal/30'
                       }`}
                     >
@@ -358,7 +471,7 @@ export default function FindMyCollegePage() {
               onClick={() => setStep(s => Math.max(0, s - 1))}
               disabled={step === 0}
             >
-              <ArrowLeft size={16} className="mr-2" /> Back
+              <span className="inline-flex items-center gap-2"><ArrowLeft size={16} /> Back</span>
             </Button>
 
             {step < 3 ? (
@@ -366,7 +479,7 @@ export default function FindMyCollegePage() {
                 onClick={() => setStep(s => s + 1)}
                 disabled={!canProceed()}
               >
-                Next <ArrowRight size={16} className="ml-2" />
+                <span className="inline-flex items-center gap-2">Next <ArrowRight size={16} /></span>
               </Button>
             ) : (
               <Button
@@ -375,9 +488,9 @@ export default function FindMyCollegePage() {
                 className="bg-gradient-to-r from-campiq-violet to-campiq-teal border-0 text-white min-w-[200px]"
               >
                 {isLoading ? (
-                  <span className="flex items-center gap-2"><Loader2 className="animate-spin" size={18} /> Analyzing...</span>
+                  <span className="inline-flex items-center gap-2"><Loader2 className="animate-spin" size={18} /> Analyzing...</span>
                 ) : (
-                  <span className="flex items-center gap-2"><Sparkles size={18} /> Find My Colleges</span>
+                  <span className="inline-flex items-center gap-2"><Sparkles size={18} /> Find My Colleges</span>
                 )}
               </Button>
             )}
