@@ -6,6 +6,9 @@ import { api } from '@/lib/api';
 import { College } from '@/types';
 import { CollegeSelector } from '@/components/compare/CollegeSelector';
 import { CompareTable } from '@/components/compare/CompareTable';
+import { RadarCompareChart } from '@/components/compare/RadarCompareChart';
+import { VerdictBox } from '@/components/compare/VerdictBox';
+import { PrioritySliders } from '@/components/compare/PrioritySliders';
 import { Button } from '@/components/ui/Button';
 import { motion } from 'framer-motion';
 import { SearchX, LayoutGrid, Share2, Check } from 'lucide-react';
@@ -135,7 +138,18 @@ function CompareContent() {
           <div className="flex items-center justify-between mb-6">
             <h2 className="text-2xl font-bold text-campiq-text-primary">Detailed Analysis</h2>
           </div>
-          <CompareTable colleges={colleges} />
+          
+          <VerdictBox colleges={colleges} />
+          
+          <div className="grid grid-cols-1 xl:grid-cols-3 gap-8">
+            <div className="xl:col-span-2">
+              <CompareTable colleges={colleges} />
+            </div>
+            <div className="space-y-8">
+              <RadarCompareChart colleges={colleges} />
+              <PrioritySliders colleges={colleges} />
+            </div>
+          </div>
         </motion.div>
       ) : (
         <motion.div
