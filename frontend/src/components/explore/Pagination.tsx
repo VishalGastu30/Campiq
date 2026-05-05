@@ -1,4 +1,4 @@
-import { ChevronLeft, ChevronRight } from 'lucide-react';
+import { ChevronLeft, ChevronRight, ChevronsLeft, ChevronsRight } from 'lucide-react';
 import { cn } from '@/lib/utils';
 
 interface PaginationProps {
@@ -12,21 +12,45 @@ interface PaginationProps {
 export function Pagination({ currentPage, totalPages, onPageChange, hasNext, hasPrev }: PaginationProps) {
   if (totalPages <= 1) return null;
 
+  // Calculate sliding window of 5 pages
+  let startPage = Math.max(1, currentPage - 2);
+  let endPage = Math.min(totalPages, startPage + 4);
+
+  // Adjust start page if we are near the end
+  if (endPage - startPage < 4) {
+    startPage = Math.max(1, endPage - 4);
+  }
+
+  const pages = [];
+  for (let i = startPage; i <= endPage; i++) {
+    pages.push(i);
+  }
+
   return (
-    <div className="flex items-center justify-center gap-4 mt-12 mb-8">
+    <div className="flex items-center justify-center gap-2 mt-12 mb-8">
+      {/* First Page Button */}
+      <button
+        onClick={() => onPageChange(1)}
+        disabled={currentPage === 1}
+        className="flex items-center justify-center w-10 h-10 rounded-lg bg-campiq-surface border border-campiq-border text-campiq-text-primary hover:bg-campiq-raised hover:border-campiq-teal/50 disabled:opacity-50 disabled:pointer-events-none transition-all"
+        title="First Page"
+      >
+        <ChevronsLeft size={20} />
+      </button>
+
+      {/* Prev Page Button */}
       <button
         onClick={() => onPageChange(currentPage - 1)}
         disabled={!hasPrev}
         className="flex items-center justify-center w-10 h-10 rounded-lg bg-campiq-surface border border-campiq-border text-campiq-text-primary hover:bg-campiq-raised hover:border-campiq-teal/50 disabled:opacity-50 disabled:pointer-events-none transition-all"
+        title="Previous Page"
       >
         <ChevronLeft size={20} />
       </button>
 
       <div className="flex items-center gap-2">
-        {Array.from({ length: totalPages }).map((_, i) => {
-          const page = i + 1;
+        {pages.map((page) => {
           const isActive = page === currentPage;
-          
           return (
             <button
               key={page}
@@ -44,12 +68,24 @@ export function Pagination({ currentPage, totalPages, onPageChange, hasNext, has
         })}
       </div>
 
+      {/* Next Page Button */}
       <button
         onClick={() => onPageChange(currentPage + 1)}
         disabled={!hasNext}
         className="flex items-center justify-center w-10 h-10 rounded-lg bg-campiq-surface border border-campiq-border text-campiq-text-primary hover:bg-campiq-raised hover:border-campiq-teal/50 disabled:opacity-50 disabled:pointer-events-none transition-all"
+        title="Next Page"
       >
         <ChevronRight size={20} />
+      </button>
+
+      {/* Last Page Button */}
+      <button
+        onClick={() => onPageChange(totalPages)}
+        disabled={currentPage === totalPages}
+        className="flex items-center justify-center w-10 h-10 rounded-lg bg-campiq-surface border border-campiq-border text-campiq-text-primary hover:bg-campiq-raised hover:border-campiq-teal/50 disabled:opacity-50 disabled:pointer-events-none transition-all"
+        title="Last Page"
+      >
+        <ChevronsRight size={20} />
       </button>
     </div>
   );
