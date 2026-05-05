@@ -17,7 +17,7 @@ const collegeQuerySchema = z.object({
   sort:     z.enum(['nirfRank', 'fees', 'placement', 'name']).optional().default('nirfRank'),
   order:    z.enum(['asc', 'desc']).optional().default('asc'),
   page:     z.coerce.number().min(1).optional().default(1),
-  limit:    z.coerce.number().min(1).max(50).optional().default(12),
+  limit:    z.coerce.number().min(1).max(1000).optional().default(12),
 });
 
 router.get('/', async (req, res, next) => {
