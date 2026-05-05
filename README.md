@@ -23,12 +23,48 @@ Built as a submission for the **Full Stack Developer Internship Demo Task — Tr
 
 ## ✨ Features
 
-- **🔍 Advanced Search & Filtering**: Robust case-insensitive search with debouncing. Filter by State, College Type, Annual Fees, and Course Category.
+- **🔍 Advanced Search & Filtering**: Robust case-insensitive search with debouncing. Filter by State, College Type, Annual Fees, and 10 specific Course Streams.
 - **📊 Compare Module**: Side-by-side comparison of up to 3 colleges with best-value highlights. Features cross-tab synchronization and shareable URLs.
-- **🤖 AI Counselor**: Integrated with Groq (LLaMA 3.3 70B) to provide personalized college recommendations based on stream, budget, and priority.
+- **🔥 Decide Mode**: A Tinder-like swipeable interface! Quickly swipe right to save a college or swipe left to skip. An intuitive way to rapidly browse and curate your shortlist from over 290+ colleges.
+- **🤖 AI Counselor**: Integrated with Groq (LLaMA 3.3 70B) to provide personalized college recommendations based on your stream, budget, and priorities.
+- **🎓 Detailed College Insights**: Comprehensive details per college, including Placement Trend Charts (via Recharts), top recruiters, accreditation stats (NAAC, NIRF), and a full tabular breakdown of programs/courses offered with realistic fees and seat numbers.
 - **🔐 Secure Authentication**: JWT-based authentication with bcrypt hashing. Protected routes for managing saved college shortlists.
 - **📱 Premium UX/UI**: Responsive mobile-first design, dark ocean theme, smooth page transitions, stagger animations, and skeleton loaders.
 - **🛡️ Production Ready**: Hardened backend with Helmet, express-rate-limit, Zod validation, and optimized Postgres queries.
+
+## 📖 User Guide: How to Use Campiq Efficiently
+
+Campiq is built to streamline the daunting task of finding the right college. Here is the recommended workflow to maximize your experience:
+
+### 1. Broad Discovery (The Explore Page)
+Start on the **Explore** page to view all 290+ tracked colleges. 
+- Use the **Global Filters** on the left to narrow down your options by **State** (e.g., Tamil Nadu), **Type** (e.g., Private, Government), and **Programs Offered** (e.g., Engineering, Medical).
+- Use the **Fee Slider** to strictly view colleges that fit your budget.
+- Sort the results by **NIRF Rank**, **Highest Placements**, or **Lowest Fees** depending on your priorities.
+
+### 2. Rapid Curation (Decide Mode)
+If you aren't sure exactly what you're looking for, click the **Find My College** button to enter **Decide Mode**.
+- Here you'll see a stack of college cards. 
+- **Swipe Right** (or click the green button) if a college interests you. It will instantly be added to your saved shortlist.
+- **Swipe Left** (or click the red button) to discard it and see the next option.
+- It's the fastest way to build a personalized list of target colleges!
+
+### 3. Deep Dive (College Detail Page)
+Click on any college card to view its comprehensive details.
+- **Overview Tab**: Read about the college, see its NAAC/NIRF approvals, and read an **AI-generated summary**.
+- **Courses Tab**: View the exact degrees, durations, annual fees, and eligibility for all programs offered.
+- **Placements Tab**: Analyze the college's placement trend chart over the years, average package, and top recruiters.
+
+### 4. Head-to-Head (Compare Mode)
+Once you have saved a few colleges or found some strong contenders, add them to the **Compare List** (using the compare button on the college card or detail page).
+- Navigate to the **Compare** page from the top navigation bar.
+- Add up to 3 colleges side-by-side.
+- Campiq will automatically highlight the "Best Value" across various metrics (like lowest fees or highest placements) in green to help you make the final decision.
+
+### 5. Personalized Advice (AI Counselor)
+Need tailored guidance? Click the floating AI robot icon in the bottom right corner.
+- Tell the AI about your budget, preferred location, and career goals.
+- The Groq-powered counselor will analyze the Campiq database and recommend the top 3-4 colleges that perfectly match your specific needs.
 
 ## 🛠️ Tech Stack
 
@@ -36,6 +72,7 @@ Built as a submission for the **Full Stack Developer Internship Demo Task — Tr
 - **Framework:** Next.js 14 (App Router)
 - **Styling:** Tailwind CSS v3
 - **Animations:** Framer Motion
+- **Charts:** Recharts
 - **State Management:** React Context + Custom Hooks
 - **Icons:** Lucide React
 
@@ -110,44 +147,46 @@ erDiagram
 - PostgreSQL database (local or Neon)
 
 ### 1. Clone the repository
-\`\`\`bash
+```bash
 git clone https://github.com/VishalGastu30/Campiq.git
 cd Campiq
-\`\`\`
+```
 
 ### 2. Setup Environment Variables
 Create `.env` in the `backend/` directory:
-\`\`\`env
+```env
 DATABASE_URL="postgresql://user:password@localhost:5432/campiq?schema=public"
 JWT_SECRET="your-super-secret-key"
 PORT=4000
 NODE_ENV=development
 FRONTEND_URL=http://localhost:3000
 GROQ_API_KEY="your-groq-api-key"
-\`\`\`
+```
 
 Create `.env.local` in the `frontend/` directory:
-\`\`\`env
+```env
 NEXT_PUBLIC_API_URL=http://localhost:4000/api
-\`\`\`
+```
 
 ### 3. Install Dependencies
-\`\`\`bash
+```bash
 npm run install:all
-\`\`\`
+```
 
 ### 4. Database Setup & Seeding
-\`\`\`bash
+```bash
 cd backend
 npx prisma migrate dev --name init
 npx prisma db seed
+# Also run the courses seed to populate realistic courses
+npx ts-node prisma/seed-courses.ts
 cd ..
-\`\`\`
+```
 
 ### 5. Start Development Servers
-\`\`\`bash
+```bash
 npm run dev
-\`\`\`
+```
 The frontend will be available at `http://localhost:3000` and the backend at `http://localhost:4000`.
 
 ## 🌍 Deployment Guide
@@ -161,8 +200,10 @@ We use Neon for Serverless PostgreSQL.
 3. Push your database schema and seed it:
 ```bash
 cd backend
-DATABASE_URL="your-neon-connection-string" npx prisma db push --accept-data-loss
-DATABASE_URL="your-neon-connection-string" npx ts-node prisma/seed.ts
+export DATABASE_URL="your-neon-connection-string"
+npx prisma db push --accept-data-loss
+npx ts-node prisma/seed.ts
+npx ts-node prisma/seed-courses.ts
 ```
 
 ### 2. Backend (Render)
