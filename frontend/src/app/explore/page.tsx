@@ -139,11 +139,15 @@ function ExploreContent() {
           <FilterPanel meta={filterMeta} filters={filters} setFilters={setFilters} />
         </aside>
 
-        {/* Mobile Filter Button */}
-        <div className="md:hidden w-full flex justify-end -mb-4">
+        {/* Mobile Actions */}
+        <div className="md:hidden w-full flex flex-col gap-3 -mb-2">
           <Button variant="secondary" onClick={() => setShowMobileFilters(true)} className="w-full">
             <SlidersHorizontal size={18} className="mr-2" />
             Filters {Object.values(filters).some(v => v !== '' && v !== 'All' && v !== 0 && v !== 5000000) && '(Active)'}
+          </Button>
+          <Button onClick={() => router.push('/decide')} className="w-full bg-gradient-sig text-white border-0">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="mr-2"><path d="M14.5 4h5v5"></path><path d="m19.5 4-5 5"></path><path d="m11 20-5-5"></path><path d="M4.5 15h5v5"></path></svg>
+            Enter Decide Mode
           </Button>
         </div>
 
