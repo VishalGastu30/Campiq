@@ -13,6 +13,9 @@ import { MapPin, Globe, Phone, Mail, Award, CheckCircle, GraduationCap, Trophy, 
 import { motion, AnimatePresence } from 'framer-motion';
 import { useCompare } from '@/context/CompareContext';
 import { useAuth } from '@/context/AuthContext';
+import { AISummaryCard } from '@/components/college/AISummaryCard';
+import { PlacementChart } from '@/components/college/PlacementChart';
+import { RelatedColleges } from '@/components/college/RelatedColleges';
 import toast from 'react-hot-toast';
 
 export default function CollegeDetailPage({ params }: { params: Promise<{ slug: string }> }) {
@@ -285,6 +288,9 @@ export default function CollegeDetailPage({ params }: { params: Promise<{ slug: 
                         )}
                       </div>
                     </section>
+
+                    {/* AI Summary */}
+                    <AISummaryCard collegeId={college.id} existingSummary={(college as any).aiSummary} />
                   </div>
                 )}
 
@@ -355,6 +361,9 @@ export default function CollegeDetailPage({ params }: { params: Promise<{ slug: 
                         ))}
                       </div>
                     </section>
+
+                    {/* Placement Trend Chart */}
+                    <PlacementChart collegeId={college.id} />
                   </div>
                 )}
               </motion.div>
@@ -419,6 +428,11 @@ export default function CollegeDetailPage({ params }: { params: Promise<{ slug: 
               </div>
             </div>
           </div>
+        </div>
+
+        {/* Related Colleges */}
+        <div className="mt-12">
+          <RelatedColleges collegeId={college.id} />
         </div>
       </div>
     </div>
