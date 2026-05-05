@@ -87,7 +87,7 @@ export function PlacementChart({ collegeId }: Props) {
                   color: '#E8F0FC',
                   fontSize: '12px',
                 }}
-                formatter={(value: number, name: string) => [
+                formatter={(value: any, name: string) => [
                   name === 'placement' ? `${value}%` : `₹${value}L`,
                   name === 'placement' ? 'Placement %' : 'Avg Package'
                 ]}
