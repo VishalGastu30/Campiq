@@ -39,7 +39,7 @@ export function VerdictBox({ colleges }: Props) {
         <span>{icon}</span>
         {label}
       </div>
-      <div className="font-bold text-campiq-teal truncate" title={college.name}>
+      <div className="font-bold text-campiq-teal line-clamp-2 leading-tight" title={college.name}>
         {college.name}
       </div>
     </div>

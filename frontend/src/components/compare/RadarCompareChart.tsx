@@ -8,16 +8,22 @@ interface Props {
 
 const COLORS = ['#00D4A0', '#F5A623', '#9B7BFF', '#FF6B6B'];
 
+function getDisplayName(c: College) {
+  if (c.shortName) return c.shortName;
+  const words = c.name.split(' ');
+  return words.length > 3 ? words.slice(0, 3).join(' ') + '...' : c.name;
+}
+
 function normalizeForRadar(colleges: College[]) {
   if (colleges.length === 0) return [];
   
   return [
-    { axis: 'Placement %', ...Object.fromEntries(colleges.map(c => [c.name, c.placementPercent || 0])) },
-    { axis: 'NIRF Score', ...Object.fromEntries(colleges.map(c => [c.name, c.nirfRank ? Math.max(0, 100 - c.nirfRank/5) : 50])) },
-    { axis: 'Rating', ...Object.fromEntries(colleges.map(c => [c.name, ((c.rating || 3.5) / 5) * 100])) },
-    { axis: 'Avg Package', ...Object.fromEntries(colleges.map(c => [c.name, Math.min(100, (c.avgPackage || 0) / 0.4)])) },
-    { axis: 'Value Score', ...Object.fromEntries(colleges.map(c => [c.name, Math.min(100, ((c.placementPercent || 0) / ((c.minFees || 100000) / 100000)) * 5)])) },
-    { axis: 'Affordability', ...Object.fromEntries(colleges.map(c => [c.name, Math.max(0, 100 - ((c.minFees || 0) / 20000))])) },
+    { axis: 'Placement %', ...Object.fromEntries(colleges.map(c => [getDisplayName(c), c.placementPercent || 0])) },
+    { axis: 'NIRF Score', ...Object.fromEntries(colleges.map(c => [getDisplayName(c), c.nirfRank ? Math.max(0, 100 - c.nirfRank/5) : 50])) },
+    { axis: 'Rating', ...Object.fromEntries(colleges.map(c => [getDisplayName(c), ((c.rating || 3.5) / 5) * 100])) },
+    { axis: 'Avg Package', ...Object.fromEntries(colleges.map(c => [getDisplayName(c), Math.min(100, (c.avgPackage || 0) / 0.4)])) },
+    { axis: 'Value Score', ...Object.fromEntries(colleges.map(c => [getDisplayName(c), Math.min(100, ((c.placementPercent || 0) / ((c.minFees || 100000) / 100000)) * 5)])) },
+    { axis: 'Affordability', ...Object.fromEntries(colleges.map(c => [getDisplayName(c), Math.max(0, 100 - ((c.minFees || 0) / 20000))])) },
   ];
 }
 
@@ -50,17 +56,20 @@ export function RadarCompareChart({ colleges }: Props) {
               }} 
             />
             
-            {colleges.map((college, i) => (
-              <Radar
-                key={college.id}
-                name={college.name}
-                dataKey={college.name}
-                stroke={COLORS[i % COLORS.length]}
-                fill={COLORS[i % COLORS.length]}
-                fillOpacity={0.15}
-                strokeWidth={2}
-              />
-            ))}
+            {colleges.map((college, i) => {
+              const displayName = getDisplayName(college);
+              return (
+                <Radar
+                  key={college.id}
+                  name={displayName}
+                  dataKey={displayName}
+                  stroke={COLORS[i % COLORS.length]}
+                  fill={COLORS[i % COLORS.length]}
+                  fillOpacity={0.15}
+                  strokeWidth={2}
+                />
+              );
+            })}
             <Legend wrapperStyle={{ paddingTop: '20px' }} />
           </RadarChart>
         </ResponsiveContainer>

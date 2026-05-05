@@ -18,7 +18,21 @@ export function HeroSection() {
   const [query, setQuery] = useState('');
   const [placeholderIndex, setPlaceholderIndex] = useState(0);
   const [isAiModalOpen, setIsAiModalOpen] = useState(false);
+  const [totalColleges, setTotalColleges] = useState<number | null>(null);
   const router = useRouter();
+
+  useEffect(() => {
+    const fetchStats = async () => {
+      try {
+        const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:4000/api'}/stats`);
+        const json = await res.json();
+        if (json.data?.totalColleges) {
+          setTotalColleges(json.data.totalColleges);
+        }
+      } catch {}
+    };
+    fetchStats();
+  }, []);
 
   // Cycle placeholders
   useEffect(() => {
@@ -59,7 +73,7 @@ export function HeroSection() {
           className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-campiq-surface border border-campiq-border mb-8 shadow-sm"
         >
           <span className="flex h-2 w-2 rounded-full bg-campiq-teal shadow-[0_0_8px_#00D4A0] animate-pulse" />
-          <span className="text-xs font-medium text-campiq-text-secondary">Discover 1,200+ colleges across India</span>
+          <span className="text-xs font-medium text-campiq-text-secondary">Discover {totalColleges ? totalColleges + '+' : '1,200+'} colleges across India</span>
         </motion.div>
 
         {/* Headline */}
