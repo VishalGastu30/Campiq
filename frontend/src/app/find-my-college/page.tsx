@@ -11,7 +11,7 @@ import {
   GraduationCap, Wallet, Target, CheckCircle2, Globe,
   Cog, BarChart3, Building2, Scale, Palette, FlaskConical,
   Briefcase, PenTool, Pill, Wheat,
-  Trophy, Medal, SlidersHorizontal, RotateCcw, Search
+  Trophy, Medal, SlidersHorizontal, RotateCcw, Search, ChevronDown
 } from 'lucide-react';
 import toast from 'react-hot-toast';
 import Link from 'next/link';
@@ -151,9 +151,9 @@ export default function FindMyCollegePage() {
           >
             <button
               onClick={() => setShowRefine(!showRefine)}
-              className="inline-flex items-center gap-2 px-4 py-2.5 rounded-xl bg-campiq-surface border border-campiq-border text-sm font-medium text-campiq-text-primary hover:border-campiq-teal/40 transition-all"
+              className="inline-flex items-center gap-2 px-5 py-2.5 rounded-xl bg-campiq-surface/40 backdrop-blur-md border border-campiq-teal/30 text-sm font-semibold text-campiq-teal shadow-[0_0_20px_rgba(0,212,160,0.1)] hover:bg-campiq-teal/10 hover:shadow-[0_0_25px_rgba(0,212,160,0.2)] transition-all duration-300 group"
             >
-              <SlidersHorizontal size={16} className="text-campiq-teal" />
+              <SlidersHorizontal size={16} className="group-hover:rotate-180 transition-transform duration-500" />
               Refine Search
             </button>
 
@@ -165,40 +165,50 @@ export default function FindMyCollegePage() {
                   exit={{ opacity: 0, height: 0 }}
                   className="overflow-hidden"
                 >
-                  <div className="mt-4 p-6 bg-campiq-surface border border-campiq-border rounded-2xl grid grid-cols-1 md:grid-cols-4 gap-6">
+                  <div className="mt-4 p-6 bg-campiq-surface/30 backdrop-blur-xl border border-campiq-teal/20 shadow-[0_8px_32px_rgba(0,212,160,0.05)] rounded-2xl grid grid-cols-1 md:grid-cols-4 gap-6 relative overflow-hidden">
+                    <div className="absolute top-0 right-0 w-64 h-64 bg-campiq-teal/5 rounded-full blur-3xl pointer-events-none transform translate-x-1/2 -translate-y-1/2" />
                     {/* Stream */}
-                    <div>
-                      <label className="text-xs text-campiq-text-muted uppercase tracking-wider font-semibold mb-2 block">Stream</label>
-                      <select
-                        value={stream}
-                        onChange={(e) => setStream(e.target.value)}
-                        className="w-full px-3 py-2.5 rounded-lg bg-campiq-base border border-campiq-border text-campiq-text-primary text-sm focus:border-campiq-teal outline-none"
-                      >
-                        {STREAMS.map(s => <option key={s.value} value={s.value}>{s.label}</option>)}
-                      </select>
+                    <div className="relative group">
+                      <label className="text-[10px] text-campiq-teal uppercase tracking-[0.2em] font-bold mb-2 block ml-1 opacity-80">Stream</label>
+                      <div className="relative">
+                        <select
+                          value={stream}
+                          onChange={(e) => setStream(e.target.value)}
+                          className="w-full px-4 py-3 rounded-xl bg-campiq-base/50 backdrop-blur-md border border-campiq-border/80 text-campiq-text-primary text-sm hover:border-campiq-teal/50 focus:border-campiq-teal focus:ring-1 focus:ring-campiq-teal outline-none transition-all cursor-pointer appearance-none"
+                        >
+                          {STREAMS.map(s => <option key={s.value} value={s.value} className="bg-campiq-surface">{s.label}</option>)}
+                        </select>
+                        <ChevronDown size={16} className="absolute right-4 top-1/2 -translate-y-1/2 text-campiq-text-muted pointer-events-none group-hover:text-campiq-teal transition-colors" />
+                      </div>
                     </div>
                     {/* Budget */}
-                    <div>
-                      <label className="text-xs text-campiq-text-muted uppercase tracking-wider font-semibold mb-2 block">Max Budget</label>
-                      <select
-                        value={budget ?? ''}
-                        onChange={(e) => setBudget(Number(e.target.value))}
-                        className="w-full px-3 py-2.5 rounded-lg bg-campiq-base border border-campiq-border text-campiq-text-primary text-sm focus:border-campiq-teal outline-none"
-                      >
-                        {BUDGETS.map(b => <option key={b.value} value={b.value}>{b.label}</option>)}
-                      </select>
+                    <div className="relative group">
+                      <label className="text-[10px] text-campiq-teal uppercase tracking-[0.2em] font-bold mb-2 block ml-1 opacity-80">Max Budget</label>
+                      <div className="relative">
+                        <select
+                          value={budget ?? ''}
+                          onChange={(e) => setBudget(Number(e.target.value))}
+                          className="w-full px-4 py-3 rounded-xl bg-campiq-base/50 backdrop-blur-md border border-campiq-border/80 text-campiq-text-primary text-sm hover:border-campiq-teal/50 focus:border-campiq-teal focus:ring-1 focus:ring-campiq-teal outline-none transition-all cursor-pointer appearance-none"
+                        >
+                          {BUDGETS.map(b => <option key={b.value} value={b.value} className="bg-campiq-surface">{b.label}</option>)}
+                        </select>
+                        <ChevronDown size={16} className="absolute right-4 top-1/2 -translate-y-1/2 text-campiq-text-muted pointer-events-none group-hover:text-campiq-teal transition-colors" />
+                      </div>
                     </div>
                     {/* State */}
-                    <div>
-                      <label className="text-xs text-campiq-text-muted uppercase tracking-wider font-semibold mb-2 block">Location</label>
-                      <select
-                        value={state}
-                        onChange={(e) => setState(e.target.value)}
-                        className="w-full px-3 py-2.5 rounded-lg bg-campiq-base border border-campiq-border text-campiq-text-primary text-sm focus:border-campiq-teal outline-none"
-                      >
-                        <option value="">All India</option>
-                        {STATES.filter(Boolean).map(s => <option key={s} value={s}>{s}</option>)}
-                      </select>
+                    <div className="relative group">
+                      <label className="text-[10px] text-campiq-teal uppercase tracking-[0.2em] font-bold mb-2 block ml-1 opacity-80">Location</label>
+                      <div className="relative">
+                        <select
+                          value={state}
+                          onChange={(e) => setState(e.target.value)}
+                          className="w-full px-4 py-3 rounded-xl bg-campiq-base/50 backdrop-blur-md border border-campiq-border/80 text-campiq-text-primary text-sm hover:border-campiq-teal/50 focus:border-campiq-teal focus:ring-1 focus:ring-campiq-teal outline-none transition-all cursor-pointer appearance-none"
+                        >
+                          <option value="" className="bg-campiq-surface">All India</option>
+                          {STATES.filter(Boolean).map(s => <option key={s} value={s} className="bg-campiq-surface">{s}</option>)}
+                        </select>
+                        <ChevronDown size={16} className="absolute right-4 top-1/2 -translate-y-1/2 text-campiq-text-muted pointer-events-none group-hover:text-campiq-teal transition-colors" />
+                      </div>
                     </div>
                     {/* Re-search */}
                     <div className="flex items-end">
@@ -255,7 +265,7 @@ export default function FindMyCollegePage() {
                       </div>
                       <div className="flex items-center gap-1.5 px-3 py-1 rounded-full bg-campiq-teal/15 border border-campiq-teal/30">
                         <Sparkles size={12} className="text-campiq-teal" />
-                        <span className="text-sm font-bold text-campiq-teal">{rec.matchScore}%</span>
+                        <span className="text-sm font-bold text-campiq-teal">{Math.round(Number(rec.matchScore) * 100)}%</span>
                       </div>
                     </div>
 
