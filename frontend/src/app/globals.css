@@ -145,7 +145,7 @@ body {
 
 /* Gradient signature utility */
 .bg-gradient-sig {
-  background: var(--gradient-sig);
+  background-image: var(--gradient-sig);
 }
 
 /* Smooth focus ring */
