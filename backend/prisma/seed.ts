@@ -63,7 +63,7 @@ async function main() {
       city: row.city || 'Unknown',
       state: row.state || 'Unknown',
       type: type,
-      nirfRank: row.nirf_rank ? parseInt(row.nirf_rank) : null,
+      nirfRank: row.nirf_rank && parseInt(row.nirf_rank) !== 0 ? parseInt(row.nirf_rank) : null,
       minFees: row.min_fees ? parseInt(row.min_fees) : null,
       maxFees: row.max_fees ? parseInt(row.max_fees) : null,
       placementPercent: row.placement_percent ? parseFloat(row.placement_percent) : null,
