@@ -2,6 +2,7 @@
 import { Router } from 'express';
 import { z } from 'zod';
 import { prisma } from '../lib/prisma';
+import Groq from 'groq-sdk';
 
 const router = Router();
 
@@ -131,6 +132,124 @@ router.get('/meta/filters', async (_req, res, next) => {
         ]
       }
     });
+  } catch (err) {
+    next(err);
+  }
+});
+
+// GET /api/colleges/autocomplete?q=...
+router.get('/autocomplete', async (req, res, next) => {
+  try {
+    const q = req.query.q as string;
+    if (!q) return res.json({ success: true, data: [] });
+
+    const colleges = await prisma.college.findMany({
+      where: {
+        OR: [
+          { name: { contains: q, mode: 'insensitive' } },
+          { city: { contains: q, mode: 'insensitive' } },
+          { shortName: { contains: q, mode: 'insensitive' } },
+        ]
+      },
+      take: 4,
+      select: {
+        id: true, slug: true, name: true, city: true, state: true,
+        nirfRank: true, logoUrl: true, type: true,
+      },
+      orderBy: [
+        { nirfRank: { sort: 'asc', nulls: 'last' } },
+      ]
+    });
+
+    res.json({ success: true, data: colleges });
+  } catch (err) {
+    next(err);
+  }
+});
+
+// GET /api/colleges/:id/related
+router.get('/:id/related', async (req, res, next) => {
+  try {
+    const { id } = req.params;
+    const college = await prisma.college.findUnique({ where: { id } });
+    if (!college) return res.json({ success: true, data: [] });
+
+    const related = await prisma.college.findMany({
+      where: {
+        AND: [
+          { id: { not: college.id } },
+          {
+            OR: [
+              { state: college.state },
+              { type: college.type }
+            ]
+          }
+        ]
+      },
+      orderBy: { rating: 'desc' },
+      take: 4,
+      select: {
+        id: true, slug: true, name: true, city: true, state: true,
+        type: true, minFees: true, placementPercent: true, rating: true,
+        imageUrl: true, logoUrl: true,
+      }
+    });
+
+    res.json({ success: true, data: related });
+  } catch (err) {
+    next(err);
+  }
+});
+
+// POST /api/colleges/:id/generate-summary
+router.post('/:id/generate-summary', async (req, res, next) => {
+  try {
+    const { id } = req.params;
+    const college = await prisma.college.findUnique({ where: { id } });
+    if (!college) {
+      return res.status(404).json({ success: false, error: { code: 'NOT_FOUND', message: 'College not found' } });
+    }
+
+    // Check if valid summary already exists (generated within last 30 days)
+    if (college.aiSummary && college.aiSummaryAt) {
+      const thirtyDaysAgo = new Date();
+      thirtyDaysAgo.setDate(thirtyDaysAgo.getDate() - 30);
+      if (college.aiSummaryAt > thirtyDaysAgo) {
+        return res.json({ success: true, data: { summary: college.aiSummary } });
+      }
+    }
+
+    const groq = new Groq({ apiKey: process.env.GROQ_API_KEY });
+    const prompt = `Write a 2-sentence college summary for Indian students in a helpful, factual tone.
+College: ${college.name}
+Location: ${college.city}, ${college.state}
+Type: ${college.type}
+NIRF Rank: ${college.nirfRank || 'Not ranked'}
+NAAC Grade: ${college.naacGrade || 'Not graded'}
+Annual Fees: ₹${(college.minFees || 100000) / 100000}L
+Placement: ${college.placementPercent || 'N/A'}%
+Avg Package: ₹${college.avgPackage || 'N/A'} LPA
+
+Output ONLY the summary paragraph. No preamble. No quotes.`;
+
+    const response = await groq.chat.completions.create({
+      model: 'llama-3.3-70b-versatile',
+      messages: [{ role: 'user', content: prompt }],
+      temperature: 0.2,
+      max_tokens: 150,
+    });
+
+    const summary = response.choices[0]?.message?.content?.trim() || 'Summary not available.';
+
+    await prisma.college.update({
+      where: { id },
+      data: {
+        aiSummary: summary,
+        aiSummaryAt: new Date(),
+      }
+    });
+
+    res.json({ success: true, data: { summary } });
   } catch (err) {
     next(err);
   }

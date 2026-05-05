@@ -7,7 +7,11 @@ import { authRoutes } from './routes/auth';
 import { savedRoutes } from './routes/saved';
 import { compareRoutes } from './routes/compare';
 import { aiRoutes } from './routes/ai';
+import { statsRoutes } from './routes/stats';
+import { streamRoutes } from './routes/streams';
+import { shortlistRoutes } from './routes/shortlist';
 import { ZodError } from 'zod';
+import rateLimit from 'express-rate-limit';
 
 const app = express();
 
@@ -28,12 +32,28 @@ app.use(express.json());
 app.get('/health', (_, res) => res.json({ status: 'ok', timestamp: new Date() }));
 app.get('/api/health', (_, res) => res.json({ status: 'ok', timestamp: new Date() })); // keep old one for compat
 
+// Rate Limiters
+const authLimiter = rateLimit({
+  windowMs: 15 * 60 * 1000,
+  max: 5,
+  message: { success: false, error: { code: 'RATE_LIMITED', message: 'Too many attempts. Try again in 15 minutes.' } }
+});
+
+const aiLimiter = rateLimit({
+  windowMs: 60 * 1000,
+  max: 10,
+  message: { success: false, error: { code: 'RATE_LIMITED', message: 'AI requests limited. Wait a moment.' } }
+});
+
 // Routes
 app.use('/api/colleges', collegeRoutes);
-app.use('/api/auth', authRoutes);
+app.use('/api/auth', authLimiter, authRoutes);
 app.use('/api/saved', savedRoutes);
 app.use('/api/compare', compareRoutes);
-app.use('/api/ai', aiRoutes);
+app.use('/api/ai', aiLimiter, aiRoutes);
+app.use('/api/stats', statsRoutes);
+app.use('/api/streams', streamRoutes);
+app.use('/api/shortlist', shortlistRoutes);
 
 // Global error handler — MUST be the last middleware
 app.use((err: any, req: express.Request, res: express.Response, next: express.NextFunction) => {
