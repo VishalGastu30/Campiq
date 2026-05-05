@@ -98,7 +98,7 @@ function ExploreContent() {
           type: filters.type !== 'All' ? filters.type : undefined,
           minFees: filters.minFees,
           maxFees: filters.maxFees,
-          course: filters.course || undefined
+          stream: filters.course || undefined
         };
         
         const res = await api.colleges.getAll(params);

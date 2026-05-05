@@ -16,6 +16,7 @@ router.get('/', async (req, res, next) => {
       success: true,
       data: {
         totalColleges,
+        totalStreams: 10,
         totalStates: stateResult.length,
         avgPlacement: Math.round(placementResult._avg.placementPercent || 0),
         lowestFees: feesResult._min.minFees || 0,
