@@ -5,14 +5,14 @@ import Link from 'next/link';
 import { TrendingUp, ArrowUpRight } from 'lucide-react';
 
 const TRENDING = [
-  { query: 'IIT Bombay', slug: 'iit-bombay', trend: '+12%' },
-  { query: 'BITS Pilani', slug: 'bits-pilani', trend: '+9%' },
-  { query: 'NIT Trichy', slug: 'nit-tiruchirappalli', trend: '+7%' },
-  { query: 'IIM Ahmedabad', slug: 'iim-ahmedabad', trend: '+15%' },
-  { query: 'VIT Vellore', slug: 'vit-vellore', trend: '+6%' },
+  { query: 'IIT Bombay', slug: 'indian-institute-of-technology-bombay', trend: '+12%' },
+  { query: 'IIT Madras', slug: 'indian-institute-of-technology-madras', trend: '+9%' },
+  { query: 'NIT Trichy', slug: 'national-institute-of-technology-tiruchirappalli', trend: '+7%' },
+  { query: 'IIM Ahmedabad', slug: 'indian-institute-of-management-ahmedabad', trend: '+15%' },
+  { query: 'VIT Vellore', slug: 'vellore-institute-of-technology', trend: '+6%' },
   { query: 'SRM Chennai', slug: 'srm-institute-of-science-and-technology', trend: '+5%' },
-  { query: 'IIIT Hyderabad', slug: 'iiit-hyderabad', trend: '+8%' },
-  { query: 'DTU Delhi', slug: 'delhi-technological-university', trend: '+4%' },
+  { query: 'IISc Bangalore', slug: 'indian-institute-of-science', trend: '+8%' },
+  { query: 'AIIMS Delhi', slug: 'all-india-institute-of-medical-sciences-delhi', trend: '+4%' },
 ];
 
 export function TrendingSearches() {
