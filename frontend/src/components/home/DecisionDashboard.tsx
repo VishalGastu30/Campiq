@@ -41,7 +41,7 @@ function MetricTile({ value, label, suffix, icon: Icon, delay }: {
       </div>
 
       <div className="font-mono text-3xl md:text-4xl font-bold text-campiq-text-primary tracking-tight mb-1">
-        {count.toLocaleString()}<span className="text-campiq-teal text-2xl">{suffix}</span>
+        {(count || 0).toLocaleString()}<span className="text-campiq-teal text-2xl">{suffix}</span>
       </div>
       <p className="text-sm text-campiq-text-muted uppercase tracking-widest font-medium">{label}</p>
     </motion.div>
